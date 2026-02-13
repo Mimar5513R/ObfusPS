@@ -365,7 +365,7 @@
     max-width: 1300px;
     margin: 0 auto;
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(6, 1fr);
     gap: 0;
   }
 
@@ -1265,6 +1265,639 @@
     .d-panel-l, .d-panel-r { clip-path: none; }
     .mode-selector pre { font-size: 0.6rem; }
   }
+
+  /* README HIGHLIGHTS */
+  .readme-section {
+    padding: 7rem 3rem;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(180deg, rgba(13,17,23,0.9) 0%, rgba(8,11,15,0.95) 100%);
+  }
+
+  .readme-inner {
+    max-width: 1300px;
+    margin: 0 auto;
+  }
+
+  .readme-head {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: 1.5rem;
+    align-items: stretch;
+  }
+
+  .readme-pill-row {
+    display: flex;
+    gap: 0.45rem;
+    flex-wrap: wrap;
+    margin-top: 0.8rem;
+  }
+
+  .readme-pill {
+    font-family: var(--mono);
+    font-size: 0.62rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    padding: 4px 10px;
+    border: 1px solid var(--border-bright);
+    color: var(--text);
+    background: #0a121c;
+  }
+
+  .readme-meta-grid {
+    margin-top: 1rem;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+  }
+
+  .readme-meta {
+    background: var(--bg);
+    padding: 0.75rem 0.8rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+
+  .readme-meta span {
+    font-family: var(--mono);
+    font-size: 0.58rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+
+  .readme-meta strong {
+    font-family: var(--display);
+    font-size: 1.4rem;
+    line-height: 1;
+    color: var(--accent);
+  }
+
+  .readme-meta strong.warn { color: var(--accent2); }
+
+  .readme-warning {
+    margin-top: 0.85rem;
+    font-family: var(--mono);
+    font-size: 0.67rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--accent2);
+  }
+
+  .readme-banner-card {
+    border: 1px solid var(--border-bright);
+    background: #060a0f;
+    padding: 1.4rem;
+    clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px));
+  }
+
+  .readme-banner-label {
+    font-family: var(--mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.65rem;
+  }
+
+  .readme-banner-text {
+    font-size: 0.88rem;
+    color: var(--text-dim);
+    line-height: 1.7;
+    font-weight: 300;
+  }
+
+  .readme-banner-link {
+    display: block;
+    margin: 0.55rem 0 0.9rem;
+    text-decoration: none;
+  }
+
+  .readme-banner-img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border: 1px solid var(--border-bright);
+    background: #0a121b;
+    clip-path: polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px);
+    box-shadow: 0 18px 50px rgba(0,0,0,0.45);
+    transition: transform 180ms ease, border-color 180ms ease;
+  }
+
+  .readme-banner-link:hover .readme-banner-img {
+    transform: translateY(-2px);
+    border-color: rgba(0, 212, 255, 0.55);
+  }
+
+  .readme-kpi-grid {
+    margin-top: 1.3rem;
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+  }
+
+  .readme-kpi {
+    background: #060a0f;
+    padding: 0.75rem;
+    text-align: center;
+  }
+
+  .readme-kpi-num {
+    display: block;
+    font-family: var(--display);
+    font-size: 1.4rem;
+    color: var(--text-bright);
+    line-height: 1;
+  }
+
+  .readme-kpi-num.cyan { color: var(--accent); }
+  .readme-kpi-num.green { color: #7fff00; }
+
+  .readme-kpi-label {
+    display: block;
+    margin-top: 0.2rem;
+    font-family: var(--mono);
+    font-size: 0.55rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+
+  .readme-grid {
+    margin-top: 1.3rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+  }
+
+  .readme-card {
+    border: 1px solid var(--border-bright);
+    background: #060a0f;
+    padding: 1.2rem;
+  }
+
+  .readme-card-title {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.13em;
+    color: var(--text-dim);
+    margin-bottom: 0.8rem;
+  }
+
+  .readme-code {
+    margin: 0;
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    line-height: 1.8;
+    color: var(--text-bright);
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  .readme-code .c { color: var(--text-dim); }
+  .readme-code .k { color: var(--accent); }
+
+  .readme-toc {
+    margin: 0;
+    padding-left: 1rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.35rem 1.2rem;
+  }
+
+  .readme-toc li {
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    line-height: 1.45;
+    font-weight: 300;
+  }
+
+  @media (max-width: 1024px) {
+    .readme-head { grid-template-columns: 1fr; }
+    .readme-meta-grid { grid-template-columns: repeat(3, 1fr); }
+    .readme-kpi-grid { grid-template-columns: repeat(3, 1fr); }
+    .readme-grid { grid-template-columns: 1fr; }
+  }
+
+  @media (max-width: 768px) {
+    .readme-section { padding: 4rem 1.5rem; }
+    .readme-meta-grid { grid-template-columns: 1fr 1fr; }
+    .readme-kpi-grid { grid-template-columns: 1fr 1fr; }
+    .readme-toc { grid-template-columns: 1fr; }
+  }
+
+  /* COMPARISON */
+  .comparison-section {
+    padding: 7rem 3rem;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .comparison-inner {
+    max-width: 1300px;
+    margin: 0 auto;
+  }
+
+  .compare-intro-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    margin-top: 3rem;
+  }
+
+  .compare-card {
+    background: var(--bg);
+    padding: 1.5rem;
+    transition: background 0.25s, border-color 0.25s;
+    border: 1px solid transparent;
+  }
+
+  .compare-card:hover {
+    background: #0b1219;
+    border-color: var(--border-bright);
+  }
+
+  .compare-name {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-bottom: 0.4rem;
+    color: var(--accent);
+  }
+
+  .compare-score {
+    font-family: var(--display);
+    font-size: 2rem;
+    line-height: 1;
+    margin-bottom: 0.5rem;
+    color: var(--text-bright);
+  }
+
+  .compare-note {
+    font-size: 0.82rem;
+    color: var(--text-dim);
+    line-height: 1.6;
+    font-weight: 300;
+  }
+
+  .method-grid {
+    margin-top: 2.5rem;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+  }
+
+  .method-item {
+    background: var(--bg);
+    padding: 1rem 1.1rem;
+  }
+
+  .method-key {
+    font-family: var(--mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    display: block;
+    margin-bottom: 0.35rem;
+  }
+
+  .method-val {
+    font-size: 0.82rem;
+    color: var(--text-dim);
+    line-height: 1.5;
+  }
+
+  .charts-grid {
+    margin-top: 2.75rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+  }
+
+  .compare-actions {
+    margin-top: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+  }
+
+  .compare-actions-left {
+    display: flex;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+  }
+
+  .compare-btn {
+    font-family: var(--mono);
+    font-size: 0.62rem;
+    text-transform: uppercase;
+    letter-spacing: 0.11em;
+    padding: 7px 12px;
+    background: transparent;
+    border: 1px solid var(--border-bright);
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .compare-btn:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+    background: rgba(0,212,255,0.05);
+  }
+
+  .compare-stamp {
+    font-family: var(--mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.08em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+  }
+
+  .metric-card {
+    background: #060a0f;
+    border: 1px solid var(--border-bright);
+    padding: 1.4rem;
+  }
+
+  .metric-title {
+    font-family: var(--mono);
+    font-size: 0.66rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--text-dim);
+    margin-bottom: 1rem;
+  }
+
+  .metric-row {
+    display: grid;
+    grid-template-columns: 140px 1fr 34px;
+    align-items: center;
+    gap: 0.7rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .metric-row:last-child { margin-bottom: 0; }
+
+  .metric-tool {
+    font-family: var(--mono);
+    font-size: 0.63rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-dim);
+    white-space: nowrap;
+  }
+
+  .metric-track {
+    height: 8px;
+    border: 1px solid var(--border);
+    background: #0a121c;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .metric-fill {
+    height: 100%;
+    width: 0%;
+    transition: width 1s ease;
+    background: linear-gradient(90deg, rgba(0,212,255,0.3), var(--accent));
+  }
+
+  .metric-fill.m-invoke { background: linear-gradient(90deg, rgba(255,62,108,0.3), var(--accent2)); }
+  .metric-fill.m-powercrypt { background: linear-gradient(90deg, rgba(0,212,255,0.3), var(--accent)); }
+  .metric-fill.m-obfusps { background: linear-gradient(90deg, rgba(255,212,59,0.3), #ffd43b); }
+  .metric-fill.m-stealth { background: linear-gradient(90deg, rgba(255,212,59,0.3), #ffd43b); } /* legacy */
+  .metric-fill.m-psobf { background: linear-gradient(90deg, rgba(127,255,0,0.3), #7fff00); }
+
+  .metric-value {
+    font-family: var(--mono);
+    font-size: 0.64rem;
+    color: var(--text-bright);
+    text-align: right;
+  }
+
+  .comparison-table-wrap {
+    margin-top: 2.75rem;
+    overflow-x: auto;
+    border: 1px solid var(--border);
+  }
+
+  .comparison-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 780px;
+    background: #060a0f;
+  }
+
+  .comparison-table th,
+  .comparison-table td {
+    padding: 0.85rem 0.95rem;
+    border-bottom: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+    text-align: left;
+    font-size: 0.78rem;
+  }
+
+  .comparison-table th {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.11em;
+    color: var(--text-dim);
+    background: #0b1219;
+  }
+
+  .comparison-table td {
+    color: var(--text);
+    font-weight: 300;
+  }
+
+  .comparison-table td:first-child {
+    font-family: var(--mono);
+    color: var(--text-bright);
+    font-weight: 500;
+  }
+
+  .cmp-pill {
+    display: inline-block;
+    padding: 2px 8px;
+    border: 1px solid var(--border-bright);
+    font-family: var(--mono);
+    font-size: 0.58rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    line-height: 1.2;
+  }
+
+  .cmp-pill.yes {
+    border-color: rgba(127,255,0,0.35);
+    background: rgba(127,255,0,0.08);
+    color: #7fff00;
+  }
+
+  .cmp-pill.no {
+    border-color: rgba(255,62,108,0.35);
+    background: rgba(255,62,108,0.08);
+    color: var(--accent2);
+  }
+
+  .cmp-pill.partial {
+    border-color: rgba(255,212,59,0.35);
+    background: rgba(255,212,59,0.08);
+    color: #ffd43b;
+  }
+
+  .cmp-pill.unknown {
+    border-color: rgba(0,212,255,0.35);
+    background: rgba(0,212,255,0.08);
+    color: var(--accent);
+  }
+
+  .comparison-table tr:last-child td { border-bottom: none; }
+  .comparison-table th:last-child, .comparison-table td:last-child { border-right: none; }
+
+  .strategy-wrap {
+    margin-top: 2.75rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+  }
+
+  .strategy-card {
+    background: #060a0f;
+    border: 1px solid var(--border-bright);
+    padding: 1.4rem;
+  }
+
+  .tree {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-top: 0.7rem;
+  }
+
+  .tree-root,
+  .tree-node {
+    border: 1px solid var(--border-bright);
+    background: #0a121b;
+    padding: 0.65rem 0.75rem;
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.05em;
+    color: var(--text-bright);
+    position: relative;
+    clip-path: polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px);
+  }
+
+  .tree-root {
+    color: var(--accent);
+    border-color: rgba(0, 212, 255, 0.45);
+    background: rgba(0, 212, 255, 0.08);
+  }
+
+  .tree-branch {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.65rem;
+  }
+
+  .tree-node::before {
+    content: '';
+    position: absolute;
+    top: -9px;
+    left: 14px;
+    width: 1px;
+    height: 9px;
+    background: var(--border-bright);
+  }
+
+  .tree-root::before { display: none; }
+
+  .compare-list {
+    display: grid;
+    gap: 0.5rem;
+    margin-top: 0.65rem;
+  }
+
+  .compare-list-item {
+    font-size: 0.83rem;
+    color: var(--text-dim);
+    line-height: 1.55;
+    border-left: 2px solid var(--border);
+    padding-left: 0.65rem;
+  }
+
+  .protocol-grid {
+    margin-top: 0.8rem;
+    display: grid;
+    gap: 0.7rem;
+  }
+
+  .protocol-item {
+    border: 1px solid var(--border-bright);
+    background: #0a121b;
+    padding: 0.85rem 0.95rem;
+    clip-path: polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px);
+  }
+
+  .protocol-head {
+    display: flex;
+    align-items: baseline;
+    gap: 0.6rem;
+  }
+
+  .protocol-num {
+    font-family: var(--mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.18em;
+    color: var(--accent2);
+  }
+
+  .protocol-title {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-bright);
+  }
+
+  .protocol-desc {
+    margin-top: 0.45rem;
+    font-size: 0.83rem;
+    color: var(--text-dim);
+    line-height: 1.55;
+  }
+
+  @media (max-width: 1024px) {
+    .compare-intro-grid { grid-template-columns: 1fr 1fr; }
+    .method-grid { grid-template-columns: 1fr 1fr 1fr; }
+    .charts-grid { grid-template-columns: 1fr; }
+    .strategy-wrap { grid-template-columns: 1fr; }
+  }
+
+  @media (max-width: 768px) {
+    .comparison-section { padding: 4rem 1.5rem; }
+    .compare-intro-grid { grid-template-columns: 1fr; }
+    .method-grid { grid-template-columns: 1fr; }
+    .metric-row { grid-template-columns: 1fr; gap: 0.35rem; }
+    .metric-value { text-align: left; }
+    .tree-branch { grid-template-columns: 1fr; }
+  }
 </style>
 </head>
 <body>
@@ -1273,12 +1906,14 @@
 <nav>
   <a href="#" class="nav-logo">Obfus<span>PS</span></a>
   <ul class="nav-links">
+    <li><a href="#docs-overview">Docs</a></li>
     <li><a href="#features">Features</a></li>
     <li><a href="#levels">Levels</a></li>
     <li><a href="#profiles">Profiles</a></li>
     <li><a href="#usage">Usage</a></li>
     <li><a href="#gui">GUI</a></li>
     <li><a href="#flags">Flags</a></li>
+    <li><a href="#comparison">Comparison</a></li>
     <li><a href="#demo">Demo</a></li>
     <li><a href="#install">Install</a></li>
     <li><a href="https://github.com/BenzoXdev/ObfusPS" target="_blank">GitHub</a></li>
@@ -1371,7 +2006,7 @@
           <!-- SLIDE 1 — MANUAL mode -->
           <div id="slide-1" class="demo-slide" style="display:none;">
             <div style="font-family:var(--mono);font-size:0.65rem;padding:0.75rem 1rem;line-height:1.75;">
-              <div style="color:#5a7a9a;"># Mode MANUAL sélectionné</div>
+              <div style="color:#5a7a9a;"># MANUAL mode selected</div>
               <div style="margin-top:0.5rem;">
                 <span style="color:#c03040;">[<span style="color:#fff;">1</span>]</span> <span style="color:#c8d8e8;">Weak        (char join)</span><br>
                 <span style="color:#c03040;">[<span style="color:#fff;">2</span>]</span> <span style="color:#c8d8e8;">Medium      (Base64)</span><br>
@@ -1439,7 +2074,7 @@
           <!-- SLIDE 3 — RECOMMEND mode -->
           <div id="slide-3" class="demo-slide" style="display:none;">
             <div style="font-family:var(--mono);font-size:0.65rem;padding:0.75rem 1rem;line-height:1.75;">
-              <div style="color:#5a7a9a;"># Mode RECOMMEND — analyse sans transformer</div>
+              <div style="color:#5a7a9a;"># RECOMMEND mode — analyze without transforming</div>
               <div style="margin-top:0.5rem;"><span style="color:#c03040;">[<span style="color:#e8f4ff;">05:12:30</span>]</span> <span style="color:#c03040;">[<span style="color:#e8f4ff;">~</span>]</span> <span style="color:#c8d8e8;"> Running -recommend on: <span style="color:#fff;">hello.ps1</span></span></div>
               <div style="margin-top:0.5rem;border:1px solid #1a2332;padding:0.6rem 0.75rem;background:rgba(0,212,255,0.03);">
                 <div style="color:#00d4ff;margin-bottom:0.3rem;">ObfusPS Script Analysis</div>
@@ -1467,6 +2102,106 @@
   </div>
 </section>
 
+<!-- README HIGHLIGHTS -->
+<section class="readme-section" id="docs-overview">
+  <div class="readme-inner">
+    <div class="readme-head">
+      <div>
+        <div class="section-tag">ObfusPS</div>
+        <h2 class="section-title">ADVANCED POWERSHELL OBFUSCATION ENGINE</h2>
+        <p class="section-desc">Go core | Smart analysis | 650/650 validated | Python GUI</p>
+
+        <div class="readme-pill-row">
+          <span class="readme-pill">Go</span>
+          <span class="readme-pill">PowerShell</span>
+          <span class="readme-pill">.NET</span>
+          <span class="readme-pill">Python</span>
+        </div>
+
+        <div class="readme-meta-grid">
+          <div class="readme-meta"><span>Tests</span><strong>650/650</strong></div>
+          <div class="readme-meta"><span>Version</span><strong>v1.2.0</strong></div>
+          <div class="readme-meta"><span>Platform</span><strong>Win/Linux/macOS</strong></div>
+          <div class="readme-meta"><span>License</span><strong>Apache-2.0</strong></div>
+          <div class="readme-meta"><span>Visitors</span><strong class="warn" id="visitor-count-main" data-visitor-count>--</strong></div>
+        </div>
+
+        <div class="readme-warning">For research and authorized testing only.</div>
+      </div>
+
+      <aside class="readme-banner-card">
+        <div class="readme-banner-label">ObfusPS banner</div>
+        <a class="readme-banner-link" href="https://github.com/BenzoXdev/ObfusPS/blob/main/docs/ObfusPS.png" target="_blank" rel="noopener">
+          <img
+            class="readme-banner-img"
+            src="https://raw.githubusercontent.com/BenzoXdev/ObfusPS/main/docs/ObfusPS.png"
+            alt="ObfusPS banner image"
+            loading="lazy"
+            decoding="async"
+          >
+        </a>
+        <p class="readme-banner-text">
+          ObfusPS transforms PowerShell scripts into obfuscated equivalents that hinder static analysis and signature-based detection, while keeping identical runtime behavior. Built on a zero-dependency Go binary with smart analysis, 5 encoding levels, 10 profiles, 9 pipeline transforms, and a full validation engine.
+        </p>
+      </aside>
+    </div>
+
+    <div class="readme-kpi-grid">
+      <div class="readme-kpi"><span class="readme-kpi-num cyan">5</span><span class="readme-kpi-label">Encoding levels</span></div>
+      <div class="readme-kpi"><span class="readme-kpi-num cyan">10</span><span class="readme-kpi-label">Profiles</span></div>
+      <div class="readme-kpi"><span class="readme-kpi-num cyan">9</span><span class="readme-kpi-label">Pipeline transforms</span></div>
+      <div class="readme-kpi"><span class="readme-kpi-num cyan">22+</span><span class="readme-kpi-label">Smart detectors</span></div>
+      <div class="readme-kpi"><span class="readme-kpi-num green">650</span><span class="readme-kpi-label">Validated combos</span></div>
+      <div class="readme-kpi"><span class="readme-kpi-num cyan">0</span><span class="readme-kpi-label">Runtime dependencies</span></div>
+    </div>
+
+    <div class="readme-grid">
+      <div class="readme-card">
+        <div class="readme-card-title">One command examples</div>
+        <pre class="readme-code"><span class="c"># One command - let the engine decide everything</span>
+<span class="k">.\obfusps.exe</span> -i script.ps1 -o out.ps1 -auto
+
+<span class="c"># Safe mode - guaranteed identical output</span>
+<span class="k">.\obfusps.exe</span> -i script.ps1 -o out.ps1 -profile safe -validate
+
+<span class="c"># Maximum obfuscation</span>
+<span class="k">.\obfusps.exe</span> -i script.ps1 -o out.ps1 -level 5 -profile paranoid -validate
+
+<span class="c"># Analyze without transforming</span>
+<span class="k">.\obfusps.exe</span> -i script.ps1 -recommend</pre>
+      </div>
+
+      <div class="readme-card">
+        <div class="readme-card-title">Table of contents</div>
+        <ol class="readme-toc">
+          <li>Getting started</li>
+          <li>Why ObfusPS?</li>
+          <li>Quick start</li>
+          <li>Prerequisites and installation</li>
+          <li>Running (CLI / Batch / Python GUI)</li>
+          <li>Architecture</li>
+          <li>Obfuscation levels (1-5)</li>
+          <li>Pipeline transforms</li>
+          <li>Profiles</li>
+          <li>Smart mode (-auto, -recommend)</li>
+          <li>Complete CLI options</li>
+          <li>Validation (-validate)</li>
+          <li>Fragmentation and integrity</li>
+          <li>Encoding and execution model</li>
+          <li>Metrics and reporting</li>
+          <li>Safety mechanisms</li>
+          <li>Best practices</li>
+          <li>Verified scenarios</li>
+          <li>Path fallback and scriptblock</li>
+          <li>Testing and troubleshooting</li>
+          <li>Project structure and API</li>
+          <li>Legal, support, changelog</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- STATS BAR -->
 <div class="stats-bar">
   <div class="stats-inner">
@@ -1485,6 +2220,10 @@
     <div class="stat-item">
       <span class="stat-num green">9</span>
       <span class="stat-label">Pipeline transforms</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-num red" id="visitor-count" data-visitor-count>--</span>
+      <span class="stat-label">Visitors</span>
     </div>
     <div class="stat-item">
       <span class="stat-num">0</span>
@@ -1964,6 +2703,281 @@
   </div>
 </div>
 
+<!-- COMPARISON -->
+<section class="comparison-section" id="comparison">
+  <div class="comparison-inner">
+    <div class="section-tag">Real comparison</div>
+    <h2 class="section-title">OBFUSPS VS PSOBF VS POWERCRYPT VS INVOKE</h2>
+    <p class="section-desc">
+      Detailed functional comparison focused on real engine capabilities: AST depth, multi-level model, profiles, fragmentation, validation, reproducibility, and reporting.
+    </p>
+
+    <div class="compare-intro-grid">
+      <article class="compare-card">
+        <div class="compare-name">ObfusPS</div>
+        <div class="compare-score">Full-stack</div>
+        <p class="compare-note">Go engine + smart analysis + validation pipeline. Includes levels 1-5, 10 profiles, auto-retry, entropy scoring, metrics report, and advanced fragmentation.</p>
+      </article>
+      <article class="compare-card">
+        <div class="compare-name">psobf</div>
+        <div class="compare-score">Pipeline-first</div>
+        <p class="compare-note">Modern pipeline model with deterministic seed and strong speed. Good fragmentation and transforms, but less native validation/metrics automation.</p>
+      </article>
+      <article class="compare-card">
+        <div class="compare-name">PowerCrypt</div>
+        <div class="compare-score">AST-heavy</div>
+        <p class="compare-note">Strong AST-centric architecture and very fast execution. Less complete in profile system, validation automation, and reporting depth.</p>
+      </article>
+      <article class="compare-card">
+        <div class="compare-name">Invoke-Obfuscation</div>
+        <div class="compare-score">Legacy</div>
+        <p class="compare-note">Historic reference framework with broad syntax tricks. Flexible for experimentation, but less aligned with modern structured pipeline engineering.</p>
+      </article>
+    </div>
+
+    <div class="method-grid">
+      <div class="method-item">
+        <span class="method-key">Comparison type</span>
+        <div class="method-val">Feature matrix + architecture depth + operational readiness.</div>
+      </div>
+      <div class="method-item">
+        <span class="method-key">Scope</span>
+        <div class="method-val">ObfusPS, psobf, PowerCrypt, Invoke-Obfuscation.</div>
+      </div>
+      <div class="method-item">
+        <span class="method-key">Target use</span>
+        <div class="method-val">Research, authorized testing, CI reproducibility, and script hardening.</div>
+      </div>
+      <div class="method-item">
+        <span class="method-key">Scale</span>
+        <div class="method-val">0-100 bars for quick visual ranking, feature table for exact status.</div>
+      </div>
+      <div class="method-item">
+        <span class="method-key">Note</span>
+        <div class="method-val">Use these as baseline capabilities. Re-benchmark every major release.</div>
+      </div>
+    </div>
+
+    <div class="compare-actions">
+      <div class="compare-actions-left">
+        <button class="compare-btn" id="download-benchmark-json">Download JSON</button>
+        <button class="compare-btn" id="download-benchmark-csv">Download CSV</button>
+      </div>
+      <div class="compare-stamp">Dataset: <span id="benchmark-version">--</span></div>
+    </div>
+
+    <script type="application/json" id="benchmark-data-json">
+{
+  "dataset": "obfusps-comparison",
+  "version": "2026.02",
+  "updated_at": "2026-02-13",
+  "scale": "0-100",
+  "tools": [
+    { "id": "obfusps", "name": "ObfusPS", "css": "m-obfusps" },
+    { "id": "psobf", "name": "psobf", "css": "m-psobf" },
+    { "id": "powercrypt", "name": "PowerCrypt", "css": "m-powercrypt" },
+    { "id": "invoke", "name": "Invoke", "css": "m-invoke" }
+  ],
+  "metrics": [
+    { "title": "AST depth and semantic awareness", "scores": { "obfusps": 95, "psobf": 60, "powercrypt": 100, "invoke": 20 } },
+    { "title": "Structured levels and profile system", "scores": { "obfusps": 100, "psobf": 70, "powercrypt": 25, "invoke": 20 } },
+    { "title": "Advanced fragmentation and polymorphism", "scores": { "obfusps": 100, "psobf": 85, "powercrypt": 40, "invoke": 15 } },
+    { "title": "Validation and safety automation", "scores": { "obfusps": 100, "psobf": 20, "powercrypt": 10, "invoke": 10 } },
+    { "title": "Determinism, metrics, and reporting", "scores": { "obfusps": 100, "psobf": 55, "powercrypt": 25, "invoke": 10 } },
+    { "title": "Overall engineering completeness", "scores": { "obfusps": 97, "psobf": 72, "powercrypt": 58, "invoke": 34 } }
+  ],
+  "features": [
+    {
+      "name": "Real AST",
+      "values": {
+        "obfusps": { "label": "Yes", "status": "yes" },
+        "psobf": { "label": "Partial", "status": "partial" },
+        "powercrypt": { "label": "Yes", "status": "yes" },
+        "invoke": { "label": "No", "status": "no" }
+      }
+    },
+    {
+      "name": "Multi-level 1-5",
+      "values": {
+        "obfusps": { "label": "Yes", "status": "yes" },
+        "psobf": { "label": "Yes", "status": "yes" },
+        "powercrypt": { "label": "Unstructured", "status": "partial" },
+        "invoke": { "label": "No", "status": "no" }
+      }
+    },
+    {
+      "name": "Multiple profiles",
+      "values": {
+        "obfusps": { "label": "10", "status": "plain" },
+        "psobf": { "label": "3", "status": "plain" },
+        "powercrypt": { "label": "No", "status": "no" },
+        "invoke": { "label": "No", "status": "no" }
+      }
+    },
+    {
+      "name": "Advanced fragmentation",
+      "values": {
+        "obfusps": { "label": "Yes (up to 256)", "status": "yes" },
+        "psobf": { "label": "Yes", "status": "yes" },
+        "powercrypt": { "label": "Limited", "status": "partial" },
+        "invoke": { "label": "No", "status": "no" }
+      }
+    },
+    {
+      "name": "RC4/XOR encoding",
+      "values": {
+        "obfusps": { "label": "Yes", "status": "yes" },
+        "psobf": { "label": "Yes", "status": "yes" },
+        "powercrypt": { "label": "Not native", "status": "partial" },
+        "invoke": { "label": "Partial", "status": "partial" }
+      }
+    },
+    {
+      "name": "Automatic validation",
+      "values": {
+        "obfusps": { "label": "Yes", "status": "yes" },
+        "psobf": { "label": "No", "status": "no" },
+        "powercrypt": { "label": "No", "status": "no" },
+        "invoke": { "label": "No", "status": "no" }
+      }
+    },
+    {
+      "name": "Progressive auto-retry",
+      "values": {
+        "obfusps": { "label": "Yes", "status": "yes" },
+        "psobf": { "label": "No", "status": "no" },
+        "powercrypt": { "label": "No", "status": "no" },
+        "invoke": { "label": "No", "status": "no" }
+      }
+    },
+    {
+      "name": "Entropy scoring",
+      "values": {
+        "obfusps": { "label": "Yes", "status": "yes" },
+        "psobf": { "label": "No", "status": "no" },
+        "powercrypt": { "label": "No", "status": "no" },
+        "invoke": { "label": "No", "status": "no" }
+      }
+    },
+    {
+      "name": "Deterministic seed",
+      "values": {
+        "obfusps": { "label": "Yes", "status": "yes" },
+        "psobf": { "label": "Yes", "status": "yes" },
+        "powercrypt": { "label": "?", "status": "unknown" },
+        "invoke": { "label": "No", "status": "no" }
+      }
+    },
+    {
+      "name": "Metrics report",
+      "values": {
+        "obfusps": { "label": "Yes", "status": "yes" },
+        "psobf": { "label": "No", "status": "no" },
+        "powercrypt": { "label": "No", "status": "no" },
+        "invoke": { "label": "No", "status": "no" }
+      }
+    },
+    {
+      "name": "Fuzzing variants",
+      "values": {
+        "obfusps": { "label": "Yes", "status": "yes" },
+        "psobf": { "label": "Yes", "status": "yes" },
+        "powercrypt": { "label": "No", "status": "no" },
+        "invoke": { "label": "No", "status": "no" }
+      }
+    },
+    {
+      "name": "Smart mode (-auto / -recommend)",
+      "values": {
+        "obfusps": { "label": "Yes", "status": "yes" },
+        "psobf": { "label": "Partial", "status": "partial" },
+        "powercrypt": { "label": "No", "status": "no" },
+        "invoke": { "label": "No", "status": "no" }
+      }
+    },
+    {
+      "name": "Cross-platform",
+      "values": {
+        "obfusps": { "label": "Yes", "status": "yes" },
+        "psobf": { "label": "Yes", "status": "yes" },
+        "powercrypt": { "label": "Yes", "status": "yes" },
+        "invoke": { "label": "Partial", "status": "partial" }
+      }
+    },
+    {
+      "name": "GUI workflow",
+      "values": {
+        "obfusps": { "label": "Yes (Python GUI)", "status": "yes" },
+        "psobf": { "label": "No", "status": "no" },
+        "powercrypt": { "label": "No", "status": "no" },
+        "invoke": { "label": "No", "status": "no" }
+      }
+    },
+    {
+      "name": "Actively maintained",
+      "values": {
+        "obfusps": { "label": "Yes", "status": "yes" },
+        "psobf": { "label": "Yes", "status": "yes" },
+        "powercrypt": { "label": "Partial", "status": "partial" },
+        "invoke": { "label": "Low", "status": "partial" }
+      }
+    }
+  ]
+}
+    </script>
+
+    <div class="charts-grid" id="benchmark-charts"></div>
+    <div class="comparison-table-wrap" id="benchmark-table-wrap"></div>
+
+    <div class="strategy-wrap">
+      <div class="strategy-card">
+        <div class="metric-title">ObfusPS positioning (strategy)</div>
+        <div class="tree">
+          <div class="tree-root">Goal: measurable technical superiority</div>
+          <div class="tree-branch">
+            <div class="tree-node">Deep AST + context-aware protection</div>
+            <div class="tree-node">Rich pipeline + profiles + levels 1-5</div>
+          </div>
+          <div class="tree-branch">
+            <div class="tree-node">Runtime validation + progressive auto-retry</div>
+            <div class="tree-node">Advanced fragmentation + deterministic seed</div>
+          </div>
+          <div class="tree-branch">
+            <div class="tree-node">Entropy scoring + detailed metrics report</div>
+            <div class="tree-node">Smart mode + GUI + CI/CD compatibility</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="strategy-card">
+        <div class="metric-title">Benchmark protocol (realistic comparison)</div>
+        <div class="protocol-grid">
+          <div class="protocol-item">
+            <div class="protocol-head"><span class="protocol-num">01</span><span class="protocol-title">Corpus</span></div>
+            <div class="protocol-desc">Run the same script corpus across all 4 tools (simple, medium, complex).</div>
+          </div>
+          <div class="protocol-item">
+            <div class="protocol-head"><span class="protocol-num">02</span><span class="protocol-title">Static metrics</span></div>
+            <div class="protocol-desc">Measure obfuscation time, output size, entropy, and static detection rate.</div>
+          </div>
+          <div class="protocol-item">
+            <div class="protocol-head"><span class="protocol-num">03</span><span class="protocol-title">Runtime fidelity</span></div>
+            <div class="protocol-desc">Verify stdout, stderr, exit code, and edge-case behavior across runs.</div>
+          </div>
+          <div class="protocol-item">
+            <div class="protocol-head"><span class="protocol-num">04</span><span class="protocol-title">Reproducibility</span></div>
+            <div class="protocol-desc">Publish the full protocol (machine, versions, options, and command lines).</div>
+          </div>
+          <div class="protocol-item">
+            <div class="protocol-head"><span class="protocol-num">05</span><span class="protocol-title">Automation</span></div>
+            <div class="protocol-desc">Regenerate charts automatically on each release.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- LIVE DEMO -->
 <div class="demo-section-wrap" id="demo">
   <div class="demo-section-inner">
@@ -1978,16 +2992,16 @@
     <!-- MODE SELECTOR BOX -->
     <div class="mode-selector">
       <pre>
-                                                      <span class="ms-border">╔════════════════════════════════════════════════════════════════╗</span>
-                                                      <span class="ms-border">║</span>                       <span class="ms-title"> SELECT MODE</span>                      <span class="ms-border">║</span>
-                                                      <span class="ms-border">╠════════════════════════════════════════════════════════════════╣</span>
-                                                      <span class="ms-border">║</span>                                                         <span class="ms-border">  ║</span>
-                                                      <span class="ms-border">║</span>   <span class="ms-key-0">[0]</span>  <span class="ms-label">AUTO        </span><span class="ms-desc">Smart — auto-detect best settings   </span> <span class="ms-border">  ║</span>
-                                                      <span class="ms-border">║</span>   <span class="ms-key-mcr">[M]</span>  <span class="ms-label">MANUAL      </span><span class="ms-desc">Choose level + profile manually     </span> <span class="ms-border">  ║</span>
-                                                      <span class="ms-border">║</span>   <span class="ms-key-mcr">[C]</span>  <span class="ms-label">COMMAND     </span><span class="ms-desc">Type raw flags / full control       </span> <span class="ms-border">  ║</span>
-                                                      <span class="ms-border">║</span>   <span class="ms-key-mcr">[R]</span>  <span class="ms-label">RECOMMEND   </span><span class="ms-desc">Analyze script, no obfuscation      </span> <span class="ms-border">  ║</span>
-                                                      <span class="ms-border">║</span>                                                         <span class="ms-border">  ║</span>
-                                                      <span class="ms-border">╚════════════════════════════════════════════════════════════════╝</span>
+                                                  <span class="ms-border">╔════════════════════════════════════════════════════════════════╗</span>
+                                                  <span class="ms-border">║</span>                       <span class="ms-title"> SELECT MODE</span>                      <span class="ms-border">║</span>
+                                                  <span class="ms-border">╠════════════════════════════════════════════════════════════════╣</span>
+                                                  <span class="ms-border">║</span>                                                         <span class="ms-border">  ║</span>
+                                                  <span class="ms-border">║</span>   <span class="ms-key-0">[0]</span>  <span class="ms-label">AUTO        </span><span class="ms-desc">Smart — auto-detect best settings   </span> <span class="ms-border">  ║</span>
+                                                  <span class="ms-border">║</span>   <span class="ms-key-mcr">[M]</span>  <span class="ms-label">MANUAL      </span><span class="ms-desc">Choose level + profile manually     </span> <span class="ms-border">  ║</span>
+                                                  <span class="ms-border">║</span>   <span class="ms-key-mcr">[C]</span>  <span class="ms-label">COMMAND     </span><span class="ms-desc">Type raw flags / full control       </span> <span class="ms-border">  ║</span>
+                                                  <span class="ms-border">║</span>   <span class="ms-key-mcr">[R]</span>  <span class="ms-label">RECOMMEND   </span><span class="ms-desc">Analyze script, no obfuscation      </span> <span class="ms-border">  ║</span>
+                                                  <span class="ms-border">║</span>                                                         <span class="ms-border">  ║</span>
+                                                  <span class="ms-border">╚════════════════════════════════════════════════════════════════╝</span>
 </pre>
       <div style="font-family:var(--mono);font-size:0.68rem;margin-top:0.5rem;display:flex;align-items:center;gap:0.75rem;">
         <span style="color:var(--text-dim);">Mode selected:</span>
@@ -2113,12 +3127,14 @@
       <div>
         <div class="footer-col-title">Navigation</div>
         <ul class="footer-links">
+          <li><a href="#docs-overview">Docs Overview</a></li>
           <li><a href="#features">Features</a></li>
           <li><a href="#levels">Obfuscation Levels</a></li>
           <li><a href="#profiles">Profiles</a></li>
           <li><a href="#usage">Usage Examples</a></li>
           <li><a href="#gui">Python GUI Modes</a></li>
           <li><a href="#flags">CLI Flags Reference</a></li>
+          <li><a href="#comparison">Comparison</a></li>
           <li><a href="#demo">Live Demo</a></li>
           <li><a href="#install">Installation</a></li>
         </ul>
@@ -2199,6 +3215,140 @@
     });
   }
 
+  function escapeHtml(value) {
+    return String(value)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  function loadBenchmarkData() {
+    const raw = document.getElementById('benchmark-data-json');
+    if (!raw) return null;
+    try {
+      return JSON.parse(raw.textContent);
+    } catch (err) {
+      console.error('Invalid benchmark JSON', err);
+      return null;
+    }
+  }
+
+  function renderBenchmarkCell(cell) {
+    if (cell === null || cell === undefined) return '--';
+    if (typeof cell === 'string' || typeof cell === 'number') return escapeHtml(cell);
+    const label = escapeHtml(cell.label ?? '--');
+    const status = cell.status || 'plain';
+    if (status === 'yes' || status === 'no' || status === 'partial' || status === 'unknown') {
+      return `<span class="cmp-pill ${status}">${label}</span>`;
+    }
+    return label;
+  }
+
+  function benchmarkToCsv(data) {
+    const headers = ['section', 'name', ...data.tools.map(t => t.name)];
+    const rows = [headers];
+
+    data.metrics.forEach(metric => {
+      rows.push(['metric', metric.title, ...data.tools.map(t => metric.scores?.[t.id] ?? '')]);
+    });
+
+    data.features.forEach(feature => {
+      rows.push([
+        'feature',
+        feature.name,
+        ...data.tools.map(t => {
+          const value = feature.values?.[t.id];
+          if (value && typeof value === 'object') return value.label ?? '';
+          return value ?? '';
+        })
+      ]);
+    });
+
+    const csvEscape = (value) => {
+      const text = String(value ?? '');
+      if (/[,"\r\n]/.test(text)) return `"${text.replace(/"/g, '""')}"`;
+      return text;
+    };
+
+    return rows.map(row => row.map(csvEscape).join(',')).join('\r\n');
+  }
+
+  function triggerDownload(filename, content, mime) {
+    const blob = new Blob([content], { type: mime });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
+  function renderBenchmarkData() {
+    const data = loadBenchmarkData();
+    if (!data) return null;
+
+    const versionEl = document.getElementById('benchmark-version');
+    if (versionEl) versionEl.textContent = `${data.dataset} v${data.version} (${data.updated_at})`;
+
+    const chartsHost = document.getElementById('benchmark-charts');
+    if (chartsHost) {
+      chartsHost.innerHTML = data.metrics.map(metric => `
+        <div class="metric-card">
+          <div class="metric-title">${escapeHtml(metric.title)}</div>
+          ${data.tools.map(tool => {
+            const score = Math.max(0, Math.min(100, Number(metric.scores?.[tool.id] ?? 0)));
+            return `<div class="metric-row"><span class="metric-tool">${escapeHtml(tool.name)}</span><div class="metric-track"><div class="metric-fill ${escapeHtml(tool.css)}" data-score="${score}"></div></div><span class="metric-value">${score}</span></div>`;
+          }).join('')}
+        </div>
+      `).join('');
+    }
+
+    const tableHost = document.getElementById('benchmark-table-wrap');
+    if (tableHost) {
+      tableHost.innerHTML = `
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>Function</th>
+              ${data.tools.map(tool => `<th>${escapeHtml(tool.name)}</th>`).join('')}
+            </tr>
+          </thead>
+          <tbody>
+            ${data.features.map(feature => `
+              <tr>
+                <td>${escapeHtml(feature.name)}</td>
+                ${data.tools.map(tool => `<td>${renderBenchmarkCell(feature.values?.[tool.id])}</td>`).join('')}
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      `;
+    }
+
+    const jsonBtn = document.getElementById('download-benchmark-json');
+    const csvBtn = document.getElementById('download-benchmark-csv');
+    if (jsonBtn) {
+      jsonBtn.onclick = () => {
+        const pretty = JSON.stringify(data, null, 2);
+        triggerDownload(`obfusps-benchmark-${data.version}.json`, `${pretty}\n`, 'application/json;charset=utf-8');
+      };
+    }
+    if (csvBtn) {
+      csvBtn.onclick = () => {
+        const csv = benchmarkToCsv(data);
+        triggerDownload(`obfusps-benchmark-${data.version}.csv`, csv, 'text/csv;charset=utf-8');
+      };
+    }
+
+    return data;
+  }
+
+  renderBenchmarkData();
+
   // ── SCROLL REVEAL ──
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(e => {
@@ -2206,7 +3356,7 @@
     });
   }, { threshold: 0.08 });
 
-  document.querySelectorAll('.feature-card, .level-item, .profile-card, .tech-card, .install-step, .flag-row').forEach(el => {
+  document.querySelectorAll('.feature-card, .level-item, .profile-card, .tech-card, .install-step, .flag-row, .compare-card, .method-item, .metric-card, .strategy-card').forEach(el => {
     el.style.opacity = '0';
     el.style.transform = 'translateY(18px)';
     el.style.transition = 'opacity 0.45s ease, transform 0.45s ease';
@@ -2215,12 +3365,79 @@
   document.querySelectorAll('.feature-card').forEach((el, i) => { el.style.transitionDelay = (i * 0.06) + 's'; });
   document.querySelectorAll('.profile-card').forEach((el, i) => { el.style.transitionDelay = (i * 0.04) + 's'; });
   document.querySelectorAll('.flag-row').forEach((el, i) => { el.style.transitionDelay = (i * 0.015) + 's'; });
+  document.querySelectorAll('.compare-card').forEach((el, i) => { el.style.transitionDelay = (i * 0.05) + 's'; });
 
   // ── NAV SCROLL ──
   const nav = document.querySelector('nav');
   window.addEventListener('scroll', () => {
     nav.style.borderBottomColor = window.scrollY > 50 ? 'var(--border-bright)' : 'var(--border)';
   });
+
+  // Comparison bars animation
+  function initComparisonBars() {
+    const section = document.getElementById('comparison');
+    if (!section) return;
+    document.querySelectorAll('#comparison .metric-fill').forEach(bar => { bar.style.width = '0%'; });
+
+    let animated = false;
+    const chartObs = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting && !animated) {
+          animated = true;
+          document.querySelectorAll('#comparison .metric-fill').forEach((bar, idx) => {
+            const score = Math.max(0, Math.min(100, Number(bar.dataset.score || 0)));
+            setTimeout(() => { bar.style.width = score + '%'; }, idx * 45);
+          });
+        }
+      });
+    }, { threshold: 0.25 });
+
+    chartObs.observe(section);
+  }
+
+  // Visitor counter with shared API and local fallback
+  async function initVisitorCounter() {
+    const counterEls = Array.from(document.querySelectorAll('[data-visitor-count]'));
+    if (!counterEls.length) return;
+
+    const formatCount = (value) => {
+      const n = Number(value);
+      return Number.isFinite(n) ? n.toLocaleString('en-US') : '--';
+    };
+
+    const setCount = (value) => {
+      const text = formatCount(value);
+      counterEls.forEach(el => { el.textContent = text; });
+    };
+
+    const fallbackLocalCounter = () => {
+      try {
+        const totalKey = 'obfusps_local_visits_total';
+        const sessionKey = 'obfusps_local_visits_seen';
+        let total = parseInt(localStorage.getItem(totalKey) || '0', 10);
+        if (!sessionStorage.getItem(sessionKey)) {
+          total += 1;
+          localStorage.setItem(totalKey, String(total));
+          sessionStorage.setItem(sessionKey, '1');
+        }
+        setCount(total);
+      } catch (_) {
+        setCount('--');
+      }
+    };
+
+    try {
+      const res = await fetch('https://api.countapi.xyz/hit/obfusps_site/visitors', { cache: 'no-store' });
+      if (!res.ok) throw new Error('Counter API unavailable');
+      const data = await res.json();
+      setCount(data.value);
+    } catch (_) {
+      fallbackLocalCounter();
+    }
+  }
+
+  initComparisonBars();
+  initVisitorCounter();
 
   // ══════════════════════════════════════
   //  LIVE DEMO ENGINE
