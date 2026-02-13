@@ -1,0 +1,2292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ObfusPS — Advanced PowerShell Obfuscation Engine</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700;800&family=Bebas+Neue&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #080b0f;
+    --surface: #0d1117;
+    --border: #1a2332;
+    --border-bright: #243448;
+    --accent: #00d4ff;
+    --accent2: #ff3e6c;
+    --accent3: #7fff00;
+    --text: #c8d8e8;
+    --text-dim: #5a7a9a;
+    --text-bright: #e8f4ff;
+    --mono: 'JetBrains Mono', monospace;
+    --display: 'Bebas Neue', sans-serif;
+    --body: 'Barlow', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--body);
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* NOISE OVERLAY */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.4;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 3rem;
+    height: 64px;
+    background: rgba(8, 11, 15, 0.85);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .nav-logo {
+    font-family: var(--display);
+    font-size: 1.6rem;
+    letter-spacing: 0.08em;
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+  }
+
+  .nav-logo span { color: var(--accent2); }
+
+  .nav-links {
+    display: flex;
+    gap: 2.5rem;
+    list-style: none;
+    align-items: center;
+  }
+
+  .nav-links a {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--text-dim);
+    text-decoration: none;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    transition: color 0.2s;
+  }
+
+  .nav-links a:hover { color: var(--accent); }
+
+  .nav-cta {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    padding: 8px 20px;
+    background: transparent;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s;
+    clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+  }
+
+  .nav-cta:hover {
+    background: var(--accent);
+    color: var(--bg);
+  }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    position: relative;
+    padding: 0 3rem;
+    overflow: hidden;
+  }
+
+  .hero-grid-bg {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0, 212, 255, 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0, 212, 255, 0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+    mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 20%, transparent 80%);
+  }
+
+  .hero-glow {
+    position: absolute;
+    width: 600px; height: 600px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(0, 212, 255, 0.06) 0%, transparent 70%);
+    top: 50%; left: 20%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    animation: pulseGlow 4s ease-in-out infinite;
+  }
+
+  .hero-glow2 {
+    position: absolute;
+    width: 400px; height: 400px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 62, 108, 0.05) 0%, transparent 70%);
+    top: 60%; right: 10%;
+    pointer-events: none;
+    animation: pulseGlow 6s ease-in-out infinite reverse;
+  }
+
+  @keyframes pulseGlow {
+    0%, 100% { opacity: 0.6; transform: translate(-50%, -50%) scale(1); }
+    50% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+  }
+
+  .hero-content {
+    max-width: 1300px;
+    margin: 0 auto;
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6rem;
+    align-items: center;
+    padding-top: 64px;
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--accent);
+    padding: 6px 14px;
+    border: 1px solid rgba(0, 212, 255, 0.3);
+    background: rgba(0, 212, 255, 0.06);
+    margin-bottom: 1.5rem;
+    clip-path: polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px);
+  }
+
+  .hero-badge::before {
+    content: '';
+    width: 6px; height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+    animation: blink 1.5s ease-in-out infinite;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  .hero-title {
+    font-family: var(--display);
+    font-size: clamp(4rem, 8vw, 7rem);
+    line-height: 0.9;
+    letter-spacing: 0.04em;
+    color: var(--text-bright);
+    margin-bottom: 0.5rem;
+  }
+
+  .hero-title .accent { color: var(--accent); }
+  .hero-title .accent2 { color: var(--accent2); }
+
+  .hero-sub {
+    font-family: var(--mono);
+    font-size: 0.85rem;
+    color: var(--accent);
+    letter-spacing: 0.08em;
+    margin-bottom: 1.5rem;
+    text-transform: uppercase;
+  }
+
+  .hero-desc {
+    font-size: 1.05rem;
+    color: var(--text);
+    max-width: 500px;
+    line-height: 1.7;
+    margin-bottom: 2.5rem;
+    font-weight: 300;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    padding: 14px 28px;
+    background: var(--accent);
+    color: var(--bg);
+    text-decoration: none;
+    cursor: pointer;
+    border: none;
+    transition: all 0.25s;
+    clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+  }
+
+  .btn-primary:hover {
+    background: #33ddff;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(0, 212, 255, 0.35);
+  }
+
+  .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    padding: 14px 28px;
+    background: transparent;
+    color: var(--text);
+    text-decoration: none;
+    border: 1px solid var(--border-bright);
+    transition: all 0.25s;
+    clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+  }
+
+  .btn-secondary:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    transform: translateY(-2px);
+  }
+
+  /* TERMINAL */
+  .terminal {
+    background: #060a0f;
+    border: 1px solid var(--border-bright);
+    border-radius: 0;
+    overflow: hidden;
+    position: relative;
+    clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px));
+  }
+
+  .terminal::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(0, 212, 255, 0.04) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  .terminal-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    background: #0d1117;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .t-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+  }
+
+  .t-red { background: #ff3e6c; }
+  .t-yellow { background: #ffd700; }
+  .t-green { background: #7fff00; }
+
+  .terminal-title {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    color: var(--text-dim);
+    margin-left: 8px;
+    letter-spacing: 0.08em;
+  }
+
+  .terminal-body {
+    padding: 1.5rem;
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    line-height: 1.9;
+  }
+
+  .t-prompt { color: var(--accent3); }
+  .t-cmd { color: var(--text-bright); }
+  .t-flag { color: var(--accent2); }
+  .t-path { color: var(--accent); }
+  .t-comment { color: var(--text-dim); }
+  .t-output { color: #5aaa88; }
+  .t-warn { color: #ffd700; }
+
+  .cursor {
+    display: inline-block;
+    width: 8px; height: 14px;
+    background: var(--accent);
+    vertical-align: middle;
+    animation: blink 1s step-end infinite;
+  }
+
+  /* STATS BAR */
+  .stats-bar {
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    padding: 1.5rem 3rem;
+    background: var(--surface);
+    overflow: hidden;
+  }
+
+  .stats-inner {
+    max-width: 1300px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0;
+  }
+
+  .stat-item {
+    padding: 0.5rem 2rem;
+    border-right: 1px solid var(--border);
+    text-align: center;
+  }
+
+  .stat-item:last-child { border-right: none; }
+  .stat-item:first-child { padding-left: 0; text-align: left; }
+
+  .stat-num {
+    font-family: var(--display);
+    font-size: 2.4rem;
+    letter-spacing: 0.04em;
+    color: var(--accent);
+    display: block;
+    line-height: 1;
+  }
+
+  .stat-num.red { color: var(--accent2); }
+  .stat-num.green { color: var(--accent3); }
+
+  .stat-label {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text-dim);
+    display: block;
+    margin-top: 4px;
+  }
+
+  /* SECTIONS */
+  section {
+    padding: 7rem 3rem;
+    max-width: 1300px;
+    margin: 0 auto;
+  }
+
+  .section-tag {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--accent);
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .section-tag::before {
+    content: '';
+    width: 24px; height: 1px;
+    background: var(--accent);
+  }
+
+  .section-title {
+    font-family: var(--display);
+    font-size: clamp(2.2rem, 4vw, 3.5rem);
+    color: var(--text-bright);
+    letter-spacing: 0.04em;
+    line-height: 1;
+    margin-bottom: 1.25rem;
+  }
+
+  .section-desc {
+    font-size: 1rem;
+    color: var(--text-dim);
+    max-width: 560px;
+    line-height: 1.7;
+    font-weight: 300;
+  }
+
+  /* FEATURES GRID */
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    margin-top: 4rem;
+  }
+
+  .feature-card {
+    background: var(--bg);
+    padding: 2.5rem;
+    position: relative;
+    overflow: hidden;
+    transition: background 0.3s;
+  }
+
+  .feature-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    transform: scaleX(0);
+    transition: transform 0.4s;
+  }
+
+  .feature-card:hover { background: #0d1520; }
+  .feature-card:hover::before { transform: scaleX(1); }
+
+  .feature-icon {
+    width: 44px; height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 212, 255, 0.08);
+    border: 1px solid rgba(0, 212, 255, 0.2);
+    margin-bottom: 1.5rem;
+    font-size: 1.1rem;
+    clip-path: polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px);
+  }
+
+  .feature-icon.red {
+    background: rgba(255, 62, 108, 0.08);
+    border-color: rgba(255, 62, 108, 0.2);
+  }
+
+  .feature-icon.green {
+    background: rgba(127, 255, 0, 0.08);
+    border-color: rgba(127, 255, 0, 0.2);
+  }
+
+  .feature-num {
+    font-family: var(--display);
+    font-size: 0.85rem;
+    letter-spacing: 0.1em;
+    color: var(--text-dim);
+    margin-bottom: 0.5rem;
+  }
+
+  .feature-title {
+    font-family: var(--body);
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--text-bright);
+    margin-bottom: 0.75rem;
+  }
+
+  .feature-desc {
+    font-size: 0.88rem;
+    color: var(--text-dim);
+    line-height: 1.65;
+    font-weight: 300;
+  }
+
+  /* LEVELS */
+  .levels-section {
+    background: var(--surface);
+    padding: 7rem 3rem;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .levels-section > .section-inner {
+    max-width: 1300px;
+    margin: 0 auto;
+  }
+
+  .levels-header {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: end;
+    margin-bottom: 4rem;
+  }
+
+  .levels-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    border: 1px solid var(--border);
+  }
+
+  .level-item {
+    display: grid;
+    grid-template-columns: 80px 1fr auto;
+    align-items: center;
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid var(--border);
+    gap: 2rem;
+    position: relative;
+    overflow: hidden;
+    transition: background 0.25s;
+  }
+
+  .level-item:last-child { border-bottom: none; }
+
+  .level-item::after {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: var(--accent);
+    transform: scaleY(0);
+    transition: transform 0.3s;
+    transform-origin: bottom;
+  }
+
+  .level-item:hover { background: rgba(0, 212, 255, 0.03); }
+  .level-item:hover::after { transform: scaleY(1); }
+
+  .level-num {
+    font-family: var(--display);
+    font-size: 2.8rem;
+    letter-spacing: 0.04em;
+    opacity: 0.25;
+    color: var(--accent);
+  }
+
+  .level-info-name {
+    font-weight: 600;
+    color: var(--text-bright);
+    font-size: 0.95rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .level-info-desc {
+    font-size: 0.82rem;
+    color: var(--text-dim);
+    font-family: var(--mono);
+  }
+
+  .level-resistance {
+    display: flex;
+    gap: 4px;
+  }
+
+  .res-dot {
+    width: 8px; height: 8px;
+    background: var(--border-bright);
+    border-radius: 0;
+    clip-path: polygon(2px 0, 100% 0, calc(100% - 2px) 100%, 0 100%);
+  }
+
+  .res-dot.filled { background: var(--accent); }
+  .res-dot.red { background: var(--accent2); }
+
+  /* PROFILES */
+  .profiles-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    margin-top: 3rem;
+  }
+
+  .profile-card {
+    background: var(--bg);
+    padding: 1.75rem;
+    transition: background 0.25s;
+    position: relative;
+  }
+
+  .profile-card:hover { background: #0b1219; }
+
+  .profile-name {
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+    margin-bottom: 0.5rem;
+  }
+
+  .profile-name.red { color: var(--accent2); }
+  .profile-name.green { color: var(--accent3); }
+  .profile-name.yellow { color: #ffd700; }
+
+  .profile-tag {
+    font-family: var(--mono);
+    font-size: 0.62rem;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 2px 8px;
+    border: 1px solid var(--border-bright);
+    display: inline-block;
+    margin-bottom: 0.75rem;
+  }
+
+  .profile-desc {
+    font-size: 0.82rem;
+    color: var(--text-dim);
+    line-height: 1.6;
+    font-weight: 300;
+  }
+
+  /* CODE SECTION */
+  .code-section {
+    padding: 7rem 3rem;
+    max-width: 1300px;
+    margin: 0 auto;
+  }
+
+  .code-tabs {
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 0;
+  }
+
+  .code-tab {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 10px 20px;
+    color: var(--text-dim);
+    cursor: pointer;
+    border: 1px solid transparent;
+    border-bottom: none;
+    background: transparent;
+    transition: all 0.2s;
+  }
+
+  .code-tab.active {
+    background: #060a0f;
+    color: var(--accent);
+    border-color: var(--border-bright);
+    border-bottom: 1px solid #060a0f;
+    margin-bottom: -1px;
+  }
+
+  .code-block {
+    background: #060a0f;
+    border: 1px solid var(--border-bright);
+    border-top: none;
+    padding: 2rem;
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    line-height: 1.8;
+    display: none;
+    position: relative;
+    clip-path: polygon(0 0, 100% 0, 100% calc(100% - 16px), calc(100% - 16px) 100%, 0 100%);
+  }
+
+  .code-block.active { display: block; }
+
+  .copy-btn {
+    position: absolute;
+    top: 1rem; right: 1rem;
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 5px 12px;
+    background: transparent;
+    border: 1px solid var(--border-bright);
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .copy-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ARCHITECTURE */
+  .arch-section {
+    background: var(--surface);
+    padding: 7rem 3rem;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .arch-inner {
+    max-width: 1300px;
+    margin: 0 auto;
+  }
+
+  .arch-flow {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin-top: 3rem;
+    flex-wrap: wrap;
+  }
+
+  .arch-node {
+    background: var(--bg);
+    border: 1px solid var(--border-bright);
+    padding: 1rem 1.5rem;
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--text-bright);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    white-space: nowrap;
+    position: relative;
+    clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+  }
+
+  .arch-node.highlight {
+    background: rgba(0, 212, 255, 0.08);
+    border-color: rgba(0, 212, 255, 0.4);
+    color: var(--accent);
+  }
+
+  .arch-arrow {
+    color: var(--text-dim);
+    font-size: 1.2rem;
+    padding: 0 0.5rem;
+  }
+
+  .arch-tech-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    margin-top: 3rem;
+  }
+
+  .tech-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    padding: 1.5rem;
+    transition: border-color 0.25s;
+  }
+
+  .tech-card:hover { border-color: var(--border-bright); }
+
+  .tech-lang {
+    font-family: var(--display);
+    font-size: 1.8rem;
+    letter-spacing: 0.06em;
+    color: var(--text-bright);
+    margin-bottom: 0.25rem;
+  }
+
+  .tech-role {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.5rem;
+  }
+
+  .tech-desc {
+    font-size: 0.82rem;
+    color: var(--text-dim);
+    line-height: 1.55;
+    font-weight: 300;
+  }
+
+  /* INSTALL */
+  .install-section {
+    padding: 7rem 3rem;
+    max-width: 1300px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5rem;
+    align-items: start;
+  }
+
+  .install-steps {
+    margin-top: 2rem;
+  }
+
+  .install-step {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    position: relative;
+  }
+
+  .install-step::before {
+    content: '';
+    position: absolute;
+    left: 15px;
+    top: 36px;
+    bottom: -2rem;
+    width: 1px;
+    background: var(--border);
+  }
+
+  .install-step:last-child::before { display: none; }
+
+  .step-num {
+    width: 32px; height: 32px;
+    min-width: 32px;
+    background: rgba(0, 212, 255, 0.1);
+    border: 1px solid rgba(0, 212, 255, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--accent);
+    clip-path: polygon(4px 0, 100% 0, 100% calc(100% - 4px), calc(100% - 4px) 100%, 0 100%, 0 4px);
+  }
+
+  .step-title {
+    font-weight: 600;
+    color: var(--text-bright);
+    margin-bottom: 0.25rem;
+  }
+
+  .step-code {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    background: #060a0f;
+    padding: 0.5rem 0.75rem;
+    border-left: 2px solid var(--accent);
+    margin-top: 0.5rem;
+  }
+
+  .t-green-text { color: var(--accent3); }
+
+  /* LEGAL BANNER */
+  .legal-banner {
+    background: rgba(255, 62, 108, 0.06);
+    border: 1px solid rgba(255, 62, 108, 0.25);
+    padding: 1rem 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 3rem;
+    font-size: 0.82rem;
+    color: var(--text-dim);
+  }
+
+  .legal-banner .icon { color: var(--accent2); font-size: 1rem; }
+
+  /* FOOTER */
+  footer {
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    padding: 4rem 3rem 2rem;
+  }
+
+  .footer-inner {
+    max-width: 1300px;
+    margin: 0 auto;
+  }
+
+  .footer-top {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 3rem;
+    margin-bottom: 3rem;
+    padding-bottom: 3rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .footer-brand-name {
+    font-family: var(--display);
+    font-size: 2rem;
+    letter-spacing: 0.06em;
+    color: var(--accent);
+    margin-bottom: 0.75rem;
+  }
+
+  .footer-brand-desc {
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    line-height: 1.65;
+    max-width: 280px;
+    font-weight: 300;
+  }
+
+  .footer-col-title {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--text-dim);
+    margin-bottom: 1rem;
+  }
+
+  .footer-links {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .footer-links a {
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    text-decoration: none;
+    transition: color 0.2s;
+    font-weight: 300;
+  }
+
+  .footer-links a:hover { color: var(--accent); }
+
+  .footer-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .footer-copy {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    letter-spacing: 0.06em;
+  }
+
+  .footer-badges {
+    display: flex;
+    gap: 0.75rem;
+  }
+
+  .badge {
+    font-family: var(--mono);
+    font-size: 0.62rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 4px 10px;
+    background: rgba(0, 212, 255, 0.06);
+    border: 1px solid rgba(0, 212, 255, 0.2);
+    color: var(--accent);
+  }
+
+  .badge.red {
+    background: rgba(255, 62, 108, 0.06);
+    border-color: rgba(255, 62, 108, 0.2);
+    color: var(--accent2);
+  }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .reveal {
+    opacity: 0;
+    animation: fadeUp 0.6s ease forwards;
+  }
+
+  .reveal.d1 { animation-delay: 0.1s; }
+  .reveal.d2 { animation-delay: 0.2s; }
+  .reveal.d3 { animation-delay: 0.3s; }
+  .reveal.d4 { animation-delay: 0.4s; }
+  .reveal.d5 { animation-delay: 0.5s; }
+
+  /* DEMO TABS (hero terminal) */
+  .demo-tab {
+    font-family: var(--mono);
+    font-size: 0.58rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 3px 8px;
+    background: transparent;
+    border: 1px solid #1a2332;
+    color: #5a7a9a;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .demo-tab:hover { border-color: #243448; color: #c8d8e8; }
+  .demo-tab.active-tab {
+    background: rgba(0,212,255,0.1);
+    border-color: rgba(0,212,255,0.4);
+    color: #00d4ff;
+  }
+  .demo-slide { animation: fadeIn 0.3s ease; }
+  @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+
+  /* FLAG ROWS */
+  .flag-row {
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    gap: 1rem;
+    padding: 0.45rem 0;
+    border-bottom: 1px solid rgba(26, 35, 50, 0.7);
+    align-items: baseline;
+  }
+  .flag-row:last-child { border-bottom: none; }
+  .flag-name {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--accent);
+    white-space: nowrap;
+  }
+  .flag-desc {
+    font-size: 0.78rem;
+    color: var(--text-dim);
+    line-height: 1.45;
+    font-weight: 300;
+  }
+
+  /* TYPEWRITER */
+  .t-line { display: block; overflow: hidden; white-space: pre; }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border-bright); }
+
+  /* RESPONSIVE */
+  @media (max-width: 1024px) {
+    .hero-content { grid-template-columns: 1fr; gap: 3rem; }
+    .stats-inner { grid-template-columns: repeat(3, 1fr); }
+    .features-grid { grid-template-columns: 1fr 1fr; }
+    .profiles-grid { grid-template-columns: repeat(3, 1fr); }
+    .arch-tech-grid { grid-template-columns: repeat(2, 1fr); }
+    .footer-top { grid-template-columns: 1fr 1fr; }
+    .install-section { grid-template-columns: 1fr; }
+    .levels-header { grid-template-columns: 1fr; }
+  }
+
+  @media (max-width: 768px) {
+    nav { padding: 0 1.5rem; }
+    .nav-links { display: none; }
+    section { padding: 4rem 1.5rem; }
+    .hero { padding: 0 1.5rem; }
+    .stats-bar { padding: 1.5rem; }
+    .stats-inner { grid-template-columns: 1fr 1fr; }
+    .features-grid { grid-template-columns: 1fr; }
+    .profiles-grid { grid-template-columns: 1fr 1fr; }
+    .arch-tech-grid { grid-template-columns: 1fr; }
+    .footer-top { grid-template-columns: 1fr; }
+    .footer-bottom { flex-direction: column; gap: 1rem; }
+    .levels-section { padding: 4rem 1.5rem; }
+    .arch-section { padding: 4rem 1.5rem; }
+    .code-section { padding: 4rem 1.5rem; }
+    .install-section { padding: 4rem 1.5rem; }
+  }
+
+  /* ══════════════════════════════════════
+     LIVE DEMO SECTION
+  ══════════════════════════════════════ */
+  .demo-section-wrap {
+    padding: 7rem 3rem;
+    border-top: 1px solid var(--border);
+    background: var(--bg);
+  }
+  .demo-section-inner { max-width: 1300px; margin: 0 auto; }
+
+  /* Mode selector box */
+  .mode-selector {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    background: #060a0f;
+    border: 1px solid var(--border-bright);
+    padding: 1.25rem 1.75rem;
+    margin-bottom: 2.5rem;
+    line-height: 1.9;
+    position: relative;
+    clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px));
+    overflow-x: auto;
+  }
+  .mode-selector pre {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    white-space: pre;
+    margin: 0;
+    color: var(--text-dim);
+  }
+  .ms-border  { color: #1e3a5a; }
+  .ms-title   { color: var(--text-bright); font-weight: 700; letter-spacing: 0.1em; }
+  .ms-key-0   { color: #7fff00; font-weight: 700; }
+  .ms-key-mcr { color: #ff3e6c; font-weight: 700; }
+  .ms-label   { color: var(--text-bright); }
+  .ms-desc    { color: var(--text-dim); }
+
+  /* Demo inner wrapper — scoped to avoid clashing with site */
+  .demo-inner-wrap { width: 100%; }
+
+  /* Transform label */
+  .d-transform-label {
+    display: flex; align-items: center; justify-content: center;
+    gap: 1rem; margin-bottom: 1.25rem;
+  }
+  .d-tl-line { flex:1; height:1px; background: linear-gradient(90deg, transparent, var(--border-bright)); }
+  .d-tl-line.r { background: linear-gradient(90deg, var(--border-bright), transparent); }
+  .d-tl-text {
+    font-family: var(--mono); font-size: 0.6rem; text-transform: uppercase;
+    letter-spacing: 0.18em; color: var(--text-dim); white-space: nowrap;
+  }
+
+  /* Panels */
+  .d-panels { display: grid; grid-template-columns: 1fr auto 1fr; align-items: stretch; }
+
+  .d-panel { background: #060a0f; border: 1px solid var(--border-bright); overflow: hidden; }
+  .d-panel-l { clip-path: polygon(0 0, 100% 0, 100% 100%, 16px 100%, 0 calc(100% - 16px)); }
+  .d-panel-r { clip-path: polygon(0 0, 100% 0, 100% calc(100% - 16px), calc(100% - 16px) 100%, 0 100%); }
+
+  .d-panel-hdr {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 14px; background: rgba(255,255,255,0.02);
+    border-bottom: 1px solid var(--border);
+  }
+  .d-dots { display: flex; gap: 6px; }
+  .d-dot { width: 9px; height: 9px; border-radius: 50%; }
+  .d-dot-r { background: #ff3e6c; } .d-dot-y { background: #ffd43b; } .d-dot-g { background: #39ff6a; }
+  .d-pname { font-family: var(--mono); font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.15em; color: var(--text-dim); }
+  .d-pbadge { font-family: var(--mono); font-size: 0.58rem; padding: 2px 8px; border: 1px solid; text-transform: uppercase; letter-spacing: 0.1em; }
+  .d-badge-i { color: #39ff6a; border-color: rgba(57,255,106,0.3); background: rgba(57,255,106,0.06); }
+  .d-badge-o { color: #ff3e6c; border-color: rgba(255,62,108,0.3); background: rgba(255,62,108,0.06); }
+  .d-panel-body { padding: 1.5rem; }
+
+  .d-input-code { font-family: var(--mono); font-size: 1.05rem; font-weight: 500; color: var(--text-bright); line-height: 1.6; }
+  .d-kw  { color: var(--accent); }
+  .d-str { color: #ffd43b; }
+  .d-lnum { display: inline-block; width: 24px; color: var(--text-dim); font-size: 0.72rem; user-select: none; margin-right: 0.5rem; text-align: right; }
+  .d-meta { margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 0.4rem; }
+  .d-mrow { display: flex; justify-content: space-between; font-family: var(--mono); font-size: 0.65rem; color: var(--text-dim); }
+  .d-mval { color: var(--text); }
+
+  /* Arrow */
+  .d-arrow { width: 80px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.5rem; }
+  .d-apipe { width: 2px; flex: 1; background: linear-gradient(to bottom, transparent, var(--accent), transparent); }
+  .d-abox {
+    width: 48px; height: 48px; border: 1px solid rgba(0,212,255,0.4);
+    background: rgba(0,212,255,0.06); display: flex; align-items: center; justify-content: center;
+    clip-path: polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px);
+    flex-shrink: 0; font-size: 1.2rem;
+    animation: arrowBounceD 1.5s ease-in-out infinite;
+  }
+  @keyframes arrowBounceD {
+    0%,100% { transform: translateY(-2px); opacity: 0.7; }
+    50%      { transform: translateY(2px);  opacity: 1; }
+  }
+
+  /* Output */
+  .d-output-scroll { max-height: 360px; overflow-y: auto; overflow-x: hidden; }
+  .d-output-scroll::-webkit-scrollbar { width: 3px; }
+  .d-output-scroll::-webkit-scrollbar-thumb { background: var(--border-bright); }
+  .d-output-code { font-family: var(--mono); font-size: 0.68rem; line-height: 1.8; color: var(--text); word-break: break-all; white-space: pre-wrap; }
+
+  /* Syntax colors for output */
+  .oc-var    { color: #00d4ff; }
+  .oc-fn     { color: #82aaff; }
+  .oc-kw     { color: #89ddff; }
+  .oc-method { color: #c3e88d; }
+  .oc-op     { color: #ff8c42; }
+  .oc-str    { color: #ffd43b; }
+  .oc-num    { color: #c792ea; }
+  .oc-pipe   { color: #ff5572; }
+  .oc-dim    { color: #3d5570; }
+  .oc-seed   { color: #3d5570; font-style: italic; }
+
+  .d-tw-cursor {
+    display: inline-block; width: 7px; height: 13px;
+    background: var(--accent); vertical-align: middle; margin-left: 2px;
+    animation: dCursorBlink 0.9s step-end infinite;
+  }
+  @keyframes dCursorBlink { 0%,100% { opacity:1; } 50% { opacity:0; } }
+
+  /* Stats bar */
+  .d-stats { display: grid; grid-template-columns: repeat(5,1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); margin-top: 1px; }
+  .d-stat  { background: #060a0f; padding: 0.75rem 1rem; display: flex; flex-direction: column; align-items: center; gap: 3px; }
+  .d-sval  { font-family: var(--display); font-size: 1.4rem; letter-spacing: 0.06em; line-height: 1; }
+  .d-sval.cyan   { color: var(--accent); }
+  .d-sval.red    { color: var(--accent2); }
+  .d-sval.green  { color: #39ff6a; }
+  .d-sval.yellow { color: #ffd43b; }
+  .d-slbl  { font-family: var(--mono); font-size: 0.56rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text-dim); }
+
+  /* Validation bar */
+  .d-vbar {
+    display: flex; align-items: center; justify-content: center; gap: 2rem;
+    padding: 0.9rem 1.5rem;
+    background: rgba(57,255,106,0.04); border: 1px solid rgba(57,255,106,0.15);
+    margin-top: 1.25rem;
+    clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+  }
+  .d-vcheck { display: flex; align-items: center; gap: 0.4rem; font-family: var(--mono); font-size: 0.65rem; color: #39ff6a; text-transform: uppercase; letter-spacing: 0.1em; }
+  .d-vdot { width:6px; height:6px; background:#39ff6a; border-radius:50%; animation: dPulse 2s ease-in-out infinite; }
+  @keyframes dPulse { 0%,100% { opacity:1; box-shadow: 0 0 0 0 rgba(57,255,106,0.5); } 50% { box-shadow: 0 0 0 6px rgba(57,255,106,0); } }
+  .d-vsep { color: var(--border-bright); font-size: 1rem; }
+
+  /* Progress + replay */
+  .d-progress { height: 2px; background: var(--border); margin-top: 1rem; overflow: hidden; }
+  .d-pfill    { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); width: 0%; transition: width 0.1s linear; }
+  .d-replay-wrap { display: flex; justify-content: center; margin-top: 1.5rem; }
+  .d-replay-btn {
+    font-family: var(--mono); font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.15em;
+    padding: 10px 28px; background: transparent; border: 1px solid var(--border-bright);
+    color: var(--text-dim); cursor: pointer; transition: all 0.25s;
+    clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .d-replay-btn:hover { border-color: var(--accent); color: var(--accent); background: rgba(0,212,255,0.05); }
+
+  @media (max-width: 768px) {
+    .demo-section-wrap { padding: 4rem 1.5rem; }
+    .d-panels { grid-template-columns: 1fr; }
+    .d-arrow { width: 100%; height: 50px; flex-direction: row; padding: 0.5rem 0; }
+    .d-apipe { width: 100%; height: 2px; background: linear-gradient(90deg, transparent, var(--accent), transparent); flex: 1; }
+    .d-stats { grid-template-columns: repeat(3,1fr); }
+    .d-panel-l, .d-panel-r { clip-path: none; }
+    .mode-selector pre { font-size: 0.6rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">Obfus<span>PS</span></a>
+  <ul class="nav-links">
+    <li><a href="#features">Features</a></li>
+    <li><a href="#levels">Levels</a></li>
+    <li><a href="#profiles">Profiles</a></li>
+    <li><a href="#usage">Usage</a></li>
+    <li><a href="#gui">GUI</a></li>
+    <li><a href="#flags">Flags</a></li>
+    <li><a href="#demo">Demo</a></li>
+    <li><a href="#install">Install</a></li>
+    <li><a href="https://github.com/BenzoXdev/ObfusPS" target="_blank">GitHub</a></li>
+  </ul>
+  <a href="https://github.com/BenzoXdev/ObfusPS/releases" target="_blank" class="nav-cta">↓ Download v1.2.0</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="home">
+  <div class="hero-grid-bg"></div>
+  <div class="hero-glow"></div>
+  <div class="hero-glow2"></div>
+  <div class="hero-content">
+    <div>
+      <div class="hero-badge reveal d1">
+        v1.2.0 — 650/650 validated
+      </div>
+      <div class="hero-sub reveal d2">Advanced PowerShell</div>
+      <h1 class="hero-title reveal d3">OBFUS<span class="accent2">PS</span><br><span class="accent">ENGINE</span></h1>
+      <p class="hero-desc reveal d4">
+        Transform PowerShell scripts into obfuscated equivalents that hinder static analysis and signature-based detection — while guaranteeing identical runtime behavior.
+      </p>
+      <div class="hero-actions reveal d5">
+        <a href="https://github.com/BenzoXdev/ObfusPS" target="_blank" class="btn-primary">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
+          GitHub Repository
+        </a>
+        <a href="#usage" class="btn-secondary">
+          ▶ Quick Start
+        </a>
+      </div>
+    </div>
+    <div class="reveal d4">
+      <!-- Terminal wrapper -->
+      <div style="background:#060a0f;border:1px solid #243448;clip-path:polygon(0 0,calc(100% - 20px) 0,100% 20px,100% 100%,20px 100%,0 calc(100% - 20px));position:relative;overflow:hidden;">
+        <!-- Top bar -->
+        <div style="display:flex;align-items:center;gap:8px;padding:10px 16px;background:#0d1117;border-bottom:1px solid #1a2332;">
+          <div style="width:10px;height:10px;border-radius:50%;background:#ff3e6c;"></div>
+          <div style="width:10px;height:10px;border-radius:50%;background:#ffd700;"></div>
+          <div style="width:10px;height:10px;border-radius:50%;background:#7fff00;"></div>
+          <span style="font-family:var(--mono);font-size:0.65rem;color:#5a7a9a;margin-left:8px;letter-spacing:0.06em;">ObfusPS-Tool.py</span>
+          <!-- Slide tabs -->
+          <div style="margin-left:auto;display:flex;gap:2px;" id="demo-tabs">
+            <button onclick="showSlide(0)" id="tab-0" class="demo-tab active-tab">AUTO</button>
+            <button onclick="showSlide(1)" id="tab-1" class="demo-tab">MANUAL</button>
+            <button onclick="showSlide(2)" id="tab-2" class="demo-tab">COMMAND</button>
+            <button onclick="showSlide(3)" id="tab-3" class="demo-tab">RECOMMEND</button>
+          </div>
+        </div>
+
+        <!-- Slides container -->
+        <div style="position:relative;overflow:hidden;">
+
+          <!-- SLIDE 0 — AUTO mode (Hello World real output) -->
+          <div id="slide-0" class="demo-slide" style="display:block;">
+            <pre style="font-family:var(--mono);font-size:0.5rem;line-height:1.2;color:#c03040;margin:0;padding:0.75rem 1rem 0.25rem;white-space:pre;">
+
+                          ▒█████   ▄▄▄▄     █████▒█    ██   ██████  ██▓███    ██████
+                          ▒██▒  ██▒▓█████▄ ▓██   ▒ ██  ▓██▒▒██    ▒ ▓██░  ██▒▒██    ▒
+                          ▒██░  ██▒▒██▒ ▄██▒████ ░▓██  ▒██░░ ▓██▄   ▓██░ ██▓▒░ ▓██▄
+                          ▒██   ██░▒██░█▀  ░▓█▒  ░▓▓█  ░██░  ▒   ██▒▒██▄█▓▒ ▒  ▒   ██▒
+                          ░ ████▓▒░░▓█  ▀█▓░▒█░   ▒▒█████▓ ▒██████▒▒▒██▒ ░  ░▒██████▒▒
+                          ░ ▒░▒░▒░ ░▒▓███▀▒ ▒ ░   ░▒▓▒ ▒ ▒ ▒ ▒▓▒ ▒ ░▒▓▒░ ░  ░▒ ▒▓▒ ▒ ░
+                            ░ ▒ ▒░ ▒░▒   ░  ░     ░░▒░ ░ ░ ░ ░▒  ░ ░░▒ ░     ░ ░▒  ░ ░
+                          ░ ░ ░ ▒   ░    ░  ░ ░    ░░░ ░ ░ ░  ░  ░  ░░       ░  ░  ░
+                              ░ ░   ░                ░           ░                 ░
+                                      ░
+              </pre>
+            <div style="font-family:var(--mono);font-size:0.68rem;padding:0 1rem 0.25rem;color:#e8f4ff;text-align:center;">ObfusPS  |  v.1.2.0</div>
+            <div style="font-family:var(--mono);font-size:0.65rem;padding:0 1rem 0.25rem;color:#c8d8e8;text-align:center;">GitHub : github.com/BenzoXdev</div>
+            <div style="font-family:var(--mono);font-size:0.65rem;padding:0.25rem 1rem;text-align:center;">
+              <span style="color:#1a2332;">╔══════════════════╗</span><br>
+              <span style="color:#1a2332;">║ </span><span style="color:#e8f4ff;">Obfuscator Tool</span><span style="color:#1a2332;"> ║</span><br>
+              <span style="color:#1a2332;">╚══════════════════╝</span>
+            </div>
+            <div style="font-family:var(--mono);font-size:0.65rem;padding:0.1rem 1rem;color:#c03040;">[<span style="color:#e8f4ff;">&gt;</span>] <span style="color:#c8d8e8;">Telegram : t.me/benzoXdev</span></div>
+            <div style="font-family:var(--mono);font-size:0.65rem;padding:0.1rem 1rem 0.5rem;color:#c03040;">[<span style="color:#e8f4ff;">&gt;</span>] <span style="color:#c8d8e8;">Instagram : instagram.com/just._.amar_x1</span></div>
+            <div style="border-top:1px solid #1a2332;padding:0.6rem 1rem;font-family:var(--mono);font-size:0.65rem;">
+              <div><span style="color:#c03040;">[<span style="color:#e8f4ff;">05:12:07</span>]</span> <span style="color:#c03040;">[<span style="color:#e8f4ff;">!</span>]</span> <span style="color:#c8d8e8;"> AUTO mode: engine will analyze and auto-select best settings.</span></div>
+              <div style="margin-top:0.3rem;color:#5a7a9a;"># Input: Write-Output "Hello World"</div>
+              <div><span style="color:#c03040;">[<span style="color:#e8f4ff;">05:12:07</span>]</span> <span style="color:#c03040;">[<span style="color:#e8f4ff;">~</span>]</span> <span style="color:#c8d8e8;"> File 1/1 - Obfuscating: <span style="color:#fff;">hello.ps1</span></span></div>
+              <div style="color:#5aaa88;">  level=5 profile=balanced complexity=3</div>
+              <div style="color:#5aaa88;">  size=1847 bytes | unique=58 | entropy=5.21 | ratio=6.0x | lines=2</div>
+              <div style="color:#5aaa88;">  validation: pass</div>
+              <div><span style="color:#c03040;">[<span style="color:#e8f4ff;">05:12:08</span>]</span> <span style="color:#c03040;">[<span style="color:#e8f4ff;">+</span>]</span> <span style="color:#c8d8e8;"> Done: <span style="color:#fff;">ObfusPS/Script-Obfuscate/hello.ps1</span></span></div>
+              <div style="margin-top:0.4rem;color:#5a7a9a;border-top:1px solid #1a2332;padding-top:0.4rem;font-size:0.58rem;word-break:break-all;line-height:1.5;">[Console]::OutputEncoding = ...; <span style="color:#00d4ff;">$aJAWwC</span> = @(<span style="color:#ffd700;">'/nm/LuepXx','M+K7HEdN6s'</span>,...); <span style="color:#00d4ff;">$tDdZs</span> = 1218952262; <span style="color:#00d4ff;">$dzvgN</span> = New-Object byte[] 32; ... GzipStream ... <span style="color:#7fff00;">&amp; ([scriptblock]::Create($AzMdWB)) @args</span><br><span style="color:#1a2332;"># ObfusPS by BenzoXdev | seed=424242</span></div>
+            </div>
+          </div>
+
+          <!-- SLIDE 1 — MANUAL mode -->
+          <div id="slide-1" class="demo-slide" style="display:none;">
+            <div style="font-family:var(--mono);font-size:0.65rem;padding:0.75rem 1rem;line-height:1.75;">
+              <div style="color:#5a7a9a;"># Mode MANUAL sélectionné</div>
+              <div style="margin-top:0.5rem;">
+                <span style="color:#c03040;">[<span style="color:#fff;">1</span>]</span> <span style="color:#c8d8e8;">Weak        (char join)</span><br>
+                <span style="color:#c03040;">[<span style="color:#fff;">2</span>]</span> <span style="color:#c8d8e8;">Medium      (Base64)</span><br>
+                <span style="color:#c03040;">[<span style="color:#fff;">3</span>]</span> <span style="color:#c8d8e8;">Strong      (Base64 + variable)</span><br>
+                <span style="color:#c03040;">[<span style="color:#fff;">4</span>]</span> <span style="color:#c8d8e8;">Very Strong (GZip + Base64)</span><br>
+                <span style="color:#c03040;">[<span style="color:#fff;">5</span>]</span> <span style="color:#c8d8e8;">Extreme     (GZip + XOR + fragmentation + noise)</span>
+              </div>
+              <div style="margin-top:0.6rem;color:#c03040;">Profiles:</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.1rem 1rem;margin-top:0.2rem;">
+                <div><span style="color:#c03040;">[1]</span> <span style="color:#7fff00;">safe</span>      <span style="color:#5a7a9a;">(compat / safe)</span></div>
+                <div><span style="color:#c03040;">[2]</span> <span style="color:#c8d8e8;">light</span>     <span style="color:#5a7a9a;">(light obfuscation)</span></div>
+                <div><span style="color:#c03040;">[3]</span> <span style="color:#c8d8e8;">balanced</span>  <span style="color:#5a7a9a;">(balanced / default)</span></div>
+                <div><span style="color:#c03040;">[4]</span> <span style="color:#ffd700;">heavy</span>     <span style="color:#5a7a9a;">(heavy obfuscation)</span></div>
+                <div><span style="color:#c03040;">[5]</span> <span style="color:#ffd700;">stealth</span>   <span style="color:#5a7a9a;">(stealth / evasion)</span></div>
+                <div><span style="color:#c03040;">[6]</span> <span style="color:#ff3e6c;">paranoid</span>  <span style="color:#5a7a9a;">(maximum paranoia)</span></div>
+                <div><span style="color:#c03040;">[7]</span> <span style="color:#ff3e6c;">redteam</span>   <span style="color:#5a7a9a;">(red-team ops)</span></div>
+                <div><span style="color:#c03040;">[8]</span> <span style="color:#00d4ff;">blueteam</span>  <span style="color:#5a7a9a;">(blue-team audit)</span></div>
+                <div><span style="color:#c03040;">[9]</span> <span style="color:#c8d8e8;">size</span>      <span style="color:#5a7a9a;">(minimize size)</span></div>
+                <div><span style="color:#c03040;">[10]</span> <span style="color:#c8d8e8;">dev</span>       <span style="color:#5a7a9a;">(dev / debug)</span></div>
+              </div>
+              <div style="margin-top:0.7rem;border-top:1px solid #1a2332;padding-top:0.5rem;">
+                <div><span style="color:#c03040;">[<span style="color:#e8f4ff;">05:12:10</span>]</span> <span style="color:#c03040;">[<span style="color:#e8f4ff;">&gt;</span>]</span> <span style="color:#c8d8e8;"> Obfuscation level (1-5, default=3) -&gt;</span> <span style="color:#e8f4ff;">5</span></div>
+                <div><span style="color:#c03040;">[<span style="color:#e8f4ff;">05:12:11</span>]</span> <span style="color:#c03040;">[<span style="color:#e8f4ff;">&gt;</span>]</span> <span style="color:#c8d8e8;"> Profile (1-10 or name, default=3/balanced) -&gt;</span> <span style="color:#e8f4ff;">6</span></div>
+                <div><span style="color:#c03040;">[<span style="color:#e8f4ff;">05:12:12</span>]</span> <span style="color:#c03040;">[<span style="color:#e8f4ff;">&gt;</span>]</span> <span style="color:#c8d8e8;"> Use native AST when available? [Y/n] -&gt;</span> <span style="color:#e8f4ff;">y</span></div>
+                <div><span style="color:#c03040;">[<span style="color:#e8f4ff;">05:12:13</span>]</span> <span style="color:#c03040;">[<span style="color:#e8f4ff;">&gt;</span>]</span> <span style="color:#c8d8e8;"> Validate output after obfuscation? [y/N] -&gt;</span> <span style="color:#e8f4ff;">y</span></div>
+                <div><span style="color:#c03040;">[<span style="color:#e8f4ff;">05:12:14</span>]</span> <span style="color:#c03040;">[<span style="color:#e8f4ff;">~</span>]</span> <span style="color:#c8d8e8;"> Obfuscating: <span style="color:#fff;">hello.ps1</span> [level=5, paranoid]</span></div>
+                <div style="color:#5aaa88;">  ✓ Validation: stdout ✓ stderr ✓ exit_code ✓</div>
+                <div style="color:#5aaa88;">  size=2341B | entropy=5.71 | ratio=7.8x</div>
+                <div><span style="color:#c03040;">[<span style="color:#e8f4ff;">05:12:15</span>]</span> <span style="color:#c03040;">[<span style="color:#e8f4ff;">+</span>]</span> <span style="color:#c8d8e8;"> Done: <span style="color:#fff;">ObfusPS/Script-Obfuscate/hello.ps1</span></span></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SLIDE 2 — COMMAND mode -->
+          <div id="slide-2" class="demo-slide" style="display:none;">
+            <div style="font-family:var(--mono);font-size:0.62rem;padding:0.75rem 1rem;line-height:1.6;">
+              <div><span style="color:#c03040;">[<span style="color:#e8f4ff;">05:12:20</span>]</span> <span style="color:#c03040;">[<span style="color:#e8f4ff;">!</span>]</span> <span style="color:#7fff00;"> COMMAND mode</span><span style="color:#c8d8e8;">: type raw ObfusPS flags. </span><span style="color:#ffd700;">-i</span><span style="color:#c8d8e8;"> and </span><span style="color:#ffd700;">-o</span><span style="color:#c8d8e8;"> are auto-filled.</span></div>
+              <div style="margin-top:0.5rem;color:#00b8e0;">╔══ Available Flags ════════════════════════════╗</div>
+              <div><span style="color:#00b8e0;">║</span>  <span style="color:#ffd700;">── Core</span> <span style="color:#5a7a9a;">──────────────────────────────────────</span>   <span style="color:#00b8e0;">║</span></div>
+              <div><span style="color:#00b8e0;">║</span>  <span style="color:#e8f4ff;">-level 1..5</span>    Obfuscation level                                                       <span style="color:#00b8e0;">      ║</span></div>
+              <div><span style="color:#00b8e0;">║</span>  <span style="color:#e8f4ff;">-profile &lt;n&gt;</span>   safe|balanced|paranoid|redteam   <span style="color:#00b8e0;">║</span></div>
+              <div><span style="color:#00b8e0;">║</span>  <span style="color:#ffd700;">── Encoding</span> <span style="color:#5a7a9a;">─────────────────────────────────</span>    <span style="color:#00b8e0;">║</span></div>
+              <div><span style="color:#00b8e0;">║</span>  <span style="color:#e8f4ff;">-strenc xor|rc4</span>  String encryption mode        <span style="color:#00b8e0;">║</span></div>
+              <div><span style="color:#00b8e0;">║</span>  <span style="color:#e8f4ff;">-iden obf|keep</span>   Identifier morphing            <span style="color:#00b8e0;">║</span></div>
+              <div><span style="color:#00b8e0;">║</span>  <span style="color:#ffd700;">── Flow</span> <span style="color:#5a7a9a;">─────────────────────────────────────</span>    <span style="color:#00b8e0;">║</span></div>
+              <div><span style="color:#00b8e0;">║</span>  <span style="color:#e8f4ff;">-cf-opaque</span>       Opaque predicate wrapper       <span style="color:#00b8e0;">║</span></div>
+              <div><span style="color:#00b8e0;">║</span>  <span style="color:#e8f4ff;">-deadcode 0..100</span> Dead-code injection %          <span style="color:#00b8e0;">║</span></div>
+              <div><span style="color:#00b8e0;">║</span>  <span style="color:#e8f4ff;">-anti-reverse</span>    Anti-debug / sandbox checks    <span style="color:#00b8e0;">║</span></div>
+              <div><span style="color:#00b8e0;">║</span>  <span style="color:#ffd700;">── Validation</span> <span style="color:#5a7a9a;">───────────────────────────────</span>    <span style="color:#00b8e0;">║</span></div>
+              <div><span style="color:#00b8e0;">║</span>  <span style="color:#e8f4ff;">-validate</span>        Compare original vs obfuscated <span style="color:#00b8e0;">║</span></div>
+              <div><span style="color:#00b8e0;">║</span>  <span style="color:#e8f4ff;">-seed N</span>          Reproducible build (CI/CD)     <span style="color:#00b8e0;">║</span></div>
+              <div style="color:#00b8e0;">╠══ Examples ═══════════════════════════════════════╣</div>
+              <div><span style="color:#00b8e0;">║</span>  <span style="color:#7fff00;">-level 5 -profile redteam -anti-reverse</span>          <span style="color:#00b8e0;">║</span></div>
+              <div><span style="color:#00b8e0;">║</span>  <span style="color:#7fff00;">-auto -auto-retry -validate-stderr ignore</span>        <span style="color:#00b8e0;">║</span></div>
+              <div style="color:#00b8e0;">╚═════════════════════════════════════════════════╝</div>
+              <div style="margin-top:0.5rem;border-top:1px solid #1a2332;padding-top:0.5rem;">
+                <div><span style="color:#c03040;">[<span style="color:#e8f4ff;">05:12:22</span>]</span> <span style="color:#c03040;">[<span style="color:#e8f4ff;">&gt;</span>]</span> <span style="color:#c8d8e8;"> Flags -&gt;</span> <span style="color:#e8f4ff;">-level 5 -profile redteam -anti-reverse -validate</span></div>
+                <div><span style="color:#c03040;">[<span style="color:#e8f4ff;">05:12:22</span>]</span> <span style="color:#c03040;">[<span style="color:#e8f4ff;">!</span>]</span> <span style="color:#c8d8e8;"> Flags: <span style="color:#fff;">-level 5 -profile redteam -anti-reverse -validate</span></span></div>
+                <div style="color:#5aaa88;">  ✓ size=2891B | entropy=5.84 | ratio=9.6x | lines=2</div>
+                <div><span style="color:#c03040;">[<span style="color:#e8f4ff;">05:12:23</span>]</span> <span style="color:#c03040;">[<span style="color:#e8f4ff;">+</span>]</span> <span style="color:#c8d8e8;"> Done: <span style="color:#fff;">ObfusPS/Script-Obfuscate/hello.ps1</span></span></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SLIDE 3 — RECOMMEND mode -->
+          <div id="slide-3" class="demo-slide" style="display:none;">
+            <div style="font-family:var(--mono);font-size:0.65rem;padding:0.75rem 1rem;line-height:1.75;">
+              <div style="color:#5a7a9a;"># Mode RECOMMEND — analyse sans transformer</div>
+              <div style="margin-top:0.5rem;"><span style="color:#c03040;">[<span style="color:#e8f4ff;">05:12:30</span>]</span> <span style="color:#c03040;">[<span style="color:#e8f4ff;">~</span>]</span> <span style="color:#c8d8e8;"> Running -recommend on: <span style="color:#fff;">hello.ps1</span></span></div>
+              <div style="margin-top:0.5rem;border:1px solid #1a2332;padding:0.6rem 0.75rem;background:rgba(0,212,255,0.03);">
+                <div style="color:#00d4ff;margin-bottom:0.3rem;">ObfusPS Script Analysis</div>
+                <div><span style="color:#5a7a9a;">File         :</span> <span style="color:#e8f4ff;">hello.ps1</span></div>
+                <div><span style="color:#5a7a9a;">Size         :</span> <span style="color:#c8d8e8;">30 bytes</span></div>
+                <div><span style="color:#5a7a9a;">Lines        :</span> <span style="color:#c8d8e8;">1</span></div>
+                <div style="margin-top:0.3rem;"><span style="color:#5a7a9a;">Complexity   :</span> <span style="color:#7fff00;">3 / 100</span> <span style="color:#5a7a9a;">(low)</span></div>
+                <div style="margin-top:0.3rem;color:#ffd700;">Detected features:</div>
+                <div style="color:#c8d8e8;">  • Write-Output / Write-Host usage</div>
+                <div style="color:#c8d8e8;">  • Simple string literal</div>
+                <div style="margin-top:0.3rem;color:#ffd700;">Recommendations:</div>
+                <div style="color:#7fff00;">  profile  = balanced</div>
+                <div style="color:#7fff00;">  level    = 5</div>
+                <div style="color:#7fff00;">  flags    = (none required)</div>
+                <div style="margin-top:0.3rem;color:#ffd700;">Suggested command:</div>
+                <div style="color:#00d4ff;">  obfusps -i hello.ps1 -o out.ps1 -level 5 -profile balanced -validate</div>
+              </div>
+              <div style="margin-top:0.5rem;"><span style="color:#c03040;">[<span style="color:#e8f4ff;">05:12:30</span>]</span> <span style="color:#c03040;">[<span style="color:#e8f4ff;">&gt;</span>]</span> <span style="color:#c8d8e8;"> Press Enter to continue.. </span><span style="display:inline-block;width:7px;height:12px;background:var(--accent);animation:blink 1s step-end infinite;vertical-align:middle;"></span></div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS BAR -->
+<div class="stats-bar">
+  <div class="stats-inner">
+    <div class="stat-item">
+      <span class="stat-num">650</span>
+      <span class="stat-label">Validated combos</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-num">5</span>
+      <span class="stat-label">Encoding levels</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-num red">10</span>
+      <span class="stat-label">Profiles</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-num green">9</span>
+      <span class="stat-label">Pipeline transforms</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-num">0</span>
+      <span class="stat-label">Runtime dependencies</span>
+    </div>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="section-tag">Core capabilities</div>
+  <h2 class="section-title">EVERYTHING YOU NEED<br>TO STAY UNDETECTED</h2>
+  <p class="section-desc">A zero-dependency Go binary with smart analysis, layered encoding, and a full validation engine to ensure behavioral fidelity.</p>
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon">⚡</div>
+      <div class="feature-num">01</div>
+      <div class="feature-title">Smart Auto-Detection</div>
+      <div class="feature-desc">22+ feature detectors automatically analyze your script, score its complexity (0–100), and select the optimal profile, level, and flags — no configuration needed.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon red">🔒</div>
+      <div class="feature-num">02</div>
+      <div class="feature-title">Behavioral Fidelity</div>
+      <div class="feature-desc">-validate compares stdout, stderr, and exit code byte-for-byte. -profile safe guarantees identical output. Auto-retry fallback with progressively safer settings.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon green">🔀</div>
+      <div class="feature-num">03</div>
+      <div class="feature-title">9 Pipeline Transforms</div>
+      <div class="feature-desc">Chain transforms in order: identifier rename, string encryption (XOR/RC4), string dictionary, number encoding, whitespace jitter, opaque predicates, dead code, and anti-reverse.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🧬</div>
+      <div class="feature-num">04</div>
+      <div class="feature-title">Polymorphic Fragmentation</div>
+      <div class="feature-desc">Level 5 uses GZip + XOR + up to 256 fragments with Fisher-Yates shuffle and 3 polymorphic decryption templates. No two outputs are the same.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon red">🛡️</div>
+      <div class="feature-num">05</div>
+      <div class="feature-title">30+ Safety Protections</div>
+      <div class="feature-desc">Here-strings, interpolated variables, backtick escapes, splatting, scoped variables, class properties, and reserved names are all automatically protected from corruption.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon green">🌐</div>
+      <div class="feature-num">06</div>
+      <div class="feature-title">Cross-Platform</div>
+      <div class="feature-desc">Single Go binary. Runs on Windows (CLI + GUI), Linux, and macOS. Supports PowerShell 5.1 and 7.x. Python GUI with 4 modes for a visual workflow.</div>
+    </div>
+  </div>
+</section>
+
+<!-- LEVELS -->
+<div class="levels-section" id="levels">
+  <div class="section-inner">
+    <div class="levels-header">
+      <div>
+        <div class="section-tag">Obfuscation depth</div>
+        <h2 class="section-title">5 ENCODING LEVELS</h2>
+        <p class="section-desc">From simple char-join to GZip+XOR+fragmentation with structural polymorphism. Each level wraps the transformed script in a different packer.</p>
+      </div>
+      <div></div>
+    </div>
+    <div class="levels-list">
+      <div class="level-item">
+        <div class="level-num">01</div>
+        <div>
+          <div class="level-info-name">Char Join</div>
+          <div class="level-info-desc">Unicode codepoints via [char]::ConvertFromUtf32, join, scriptblock</div>
+        </div>
+        <div class="level-resistance">
+          <div class="res-dot filled"></div>
+          <div class="res-dot"></div>
+          <div class="res-dot"></div>
+          <div class="res-dot"></div>
+          <div class="res-dot"></div>
+        </div>
+      </div>
+      <div class="level-item">
+        <div class="level-num">02</div>
+        <div>
+          <div class="level-info-name">Base64</div>
+          <div class="level-info-desc">UTF-8 → Base64, [Convert]::FromBase64String, decode, execute</div>
+        </div>
+        <div class="level-resistance">
+          <div class="res-dot filled"></div>
+          <div class="res-dot filled"></div>
+          <div class="res-dot"></div>
+          <div class="res-dot"></div>
+          <div class="res-dot"></div>
+        </div>
+      </div>
+      <div class="level-item">
+        <div class="level-num">03</div>
+        <div>
+          <div class="level-info-name">Base64 + Variable</div>
+          <div class="level-info-desc">Intermediate variable for 2-step decode — breaks simple pattern matching</div>
+        </div>
+        <div class="level-resistance">
+          <div class="res-dot filled"></div>
+          <div class="res-dot filled"></div>
+          <div class="res-dot filled"></div>
+          <div class="res-dot"></div>
+          <div class="res-dot"></div>
+        </div>
+      </div>
+      <div class="level-item">
+        <div class="level-num">04</div>
+        <div>
+          <div class="level-info-name">GZip + Base64</div>
+          <div class="level-info-desc">GZip compress, Base64, MemoryStream, GzipStream, StreamReader</div>
+        </div>
+        <div class="level-resistance">
+          <div class="res-dot filled"></div>
+          <div class="res-dot filled"></div>
+          <div class="res-dot filled"></div>
+          <div class="res-dot filled"></div>
+          <div class="res-dot"></div>
+        </div>
+      </div>
+      <div class="level-item">
+        <div class="level-num">05</div>
+        <div>
+          <div class="level-info-name">GZip + XOR + Fragmentation</div>
+          <div class="level-info-desc">GZip, XOR 32-byte key, Base64, 256 fragments, Fisher-Yates shuffle, 3 polymorphic templates + decoy vars</div>
+        </div>
+        <div class="level-resistance">
+          <div class="res-dot filled red"></div>
+          <div class="res-dot filled red"></div>
+          <div class="res-dot filled red"></div>
+          <div class="res-dot filled red"></div>
+          <div class="res-dot filled red"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PROFILES -->
+<section id="profiles">
+  <div class="section-tag">Configuration presets</div>
+  <h2 class="section-title">10 OBFUSCATION PROFILES</h2>
+  <p class="section-desc">From zero-transform to maximum obfuscation. Explicit flags always override profile defaults.</p>
+  <div class="profiles-grid">
+    <div class="profile-card">
+      <div class="profile-name green">safe</div>
+      <div class="profile-tag">Production</div>
+      <div class="profile-desc">Identical output guaranteed. No transforms. FlowSafe on. Best for production use.</div>
+    </div>
+    <div class="profile-card">
+      <div class="profile-name">light</div>
+      <div class="profile-tag">Minimal</div>
+      <div class="profile-desc">Minimal, fast, compatible. Tight fragmentation only.</div>
+    </div>
+    <div class="profile-card">
+      <div class="profile-name">balanced</div>
+      <div class="profile-tag">Default</div>
+      <div class="profile-desc">XOR string encoding, 30% string dict, 10% dead code. Good all-around mix.</div>
+    </div>
+    <div class="profile-card">
+      <div class="profile-name yellow">heavy</div>
+      <div class="profile-tag">Strong</div>
+      <div class="profile-desc">RC4 encryption, identifier renaming, 50% string dict, loose fragments.</div>
+    </div>
+    <div class="profile-card">
+      <div class="profile-name yellow">stealth</div>
+      <div class="profile-tag">Evasion</div>
+      <div class="profile-desc">RC4, identifier renaming, random seed, polymorphic templates. Pro fragments.</div>
+    </div>
+    <div class="profile-card">
+      <div class="profile-name red">paranoid</div>
+      <div class="profile-tag">Maximum</div>
+      <div class="profile-desc">Every transform enabled. RC4, 60% dict, 30% dead code, anti-debug, all flags.</div>
+    </div>
+    <div class="profile-card">
+      <div class="profile-name red">redteam</div>
+      <div class="profile-tag">Red Ops</div>
+      <div class="profile-desc">Red team operations. RC4, identifier rename, anti-reverse, pro fragmentation.</div>
+    </div>
+    <div class="profile-card">
+      <div class="profile-name">blueteam</div>
+      <div class="profile-tag">Audit</div>
+      <div class="profile-desc">Deterministic, reproducible builds for blue team auditing. No anti-debug.</div>
+    </div>
+    <div class="profile-card">
+      <div class="profile-name green">size</div>
+      <div class="profile-tag">Minimal output</div>
+      <div class="profile-desc">No encryption, no dead code. Tight fragmentation only. Smallest output.</div>
+    </div>
+    <div class="profile-card">
+      <div class="profile-name">dev</div>
+      <div class="profile-tag">Debug</div>
+      <div class="profile-desc">Zero transforms, easy human inspection. For development and debugging.</div>
+    </div>
+  </div>
+</section>
+
+<!-- USAGE / CODE -->
+<div class="code-section" id="usage">
+  <div class="section-tag">Quick reference</div>
+  <h2 class="section-title">USAGE EXAMPLES</h2>
+  <div style="margin-top:2.5rem;">
+    <div class="code-tabs">
+      <button class="code-tab active" onclick="switchTab(0)">Basic</button>
+      <button class="code-tab" onclick="switchTab(1)">Advanced</button>
+      <button class="code-tab" onclick="switchTab(2)">Pipeline</button>
+      <button class="code-tab" onclick="switchTab(3)">Go API</button>
+    </div>
+    <div class="code-block active" id="tab0">
+      <button class="copy-btn" onclick="copyCode(0)">copy</button>
+      <div>
+        <span class="t-comment"># Smart mode — engine auto-detects best settings</span><br>
+        <span class="t-cmd">.\obfusps.exe</span> <span class="t-flag">-i</span> <span class="t-path">script.ps1</span> <span class="t-flag">-o</span> <span class="t-path">out.ps1</span> <span class="t-flag">-auto</span><br><br>
+        <span class="t-comment"># Safe + validated (production)</span><br>
+        <span class="t-cmd">.\obfusps.exe</span> <span class="t-flag">-i</span> <span class="t-path">script.ps1</span> <span class="t-flag">-o</span> <span class="t-path">out.ps1</span> <span class="t-flag">-profile</span> safe <span class="t-flag">-validate</span><br><br>
+        <span class="t-comment"># Maximum obfuscation</span><br>
+        <span class="t-cmd">.\obfusps.exe</span> <span class="t-flag">-i</span> <span class="t-path">script.ps1</span> <span class="t-flag">-o</span> <span class="t-path">out.ps1</span> <span class="t-flag">-level</span> 5 <span class="t-flag">-profile</span> paranoid <span class="t-flag">-validate</span><br><br>
+        <span class="t-comment"># Analyze without transforming</span><br>
+        <span class="t-cmd">.\obfusps.exe</span> <span class="t-flag">-i</span> <span class="t-path">script.ps1</span> <span class="t-flag">-recommend</span>
+      </div>
+    </div>
+    <div class="code-block" id="tab1">
+      <button class="copy-btn" onclick="copyCode(1)">copy</button>
+      <div>
+        <span class="t-comment"># Red team with anti-reverse</span><br>
+        <span class="t-cmd">.\obfusps.exe</span> <span class="t-flag">-i</span> payload.ps1 <span class="t-flag">-o</span> out.ps1 <span class="t-flag">-profile</span> redteam <span class="t-flag">-level</span> 5 <span class="t-flag">-anti-reverse</span><br><br>
+        <span class="t-comment"># Module file (.psm1)</span><br>
+        <span class="t-cmd">.\obfusps.exe</span> <span class="t-flag">-i</span> module.psm1 <span class="t-flag">-o</span> out.psm1 <span class="t-flag">-profile</span> balanced <span class="t-flag">-module-aware</span> <span class="t-flag">-use-ast</span> <span class="t-flag">-validate</span><br><br>
+        <span class="t-comment"># Reproducible CI/CD build (seed)</span><br>
+        <span class="t-cmd">.\obfusps.exe</span> <span class="t-flag">-i</span> script.ps1 <span class="t-flag">-o</span> out.ps1 <span class="t-flag">-level</span> 5 <span class="t-flag">-seed</span> 42 <span class="t-flag">-q</span><br><br>
+        <span class="t-comment"># Generate 10 polymorphic variants (fuzz)</span><br>
+        <span class="t-cmd">.\obfusps.exe</span> <span class="t-flag">-i</span> script.ps1 <span class="t-flag">-o</span> out.ps1 <span class="t-flag">-level</span> 5 <span class="t-flag">-profile</span> stealth <span class="t-flag">-fuzz</span> 10<br><br>
+        <span class="t-comment"># Layer-based (high-level shortcut)</span><br>
+        <span class="t-cmd">.\obfusps.exe</span> build <span class="t-flag">-i</span> script.ps1 <span class="t-flag">-layers</span> AST,Flow,Encoding,Runtime <span class="t-flag">-profile</span> stealth <span class="t-flag">-o</span> out.ps1
+      </div>
+    </div>
+    <div class="code-block" id="tab2">
+      <button class="copy-btn" onclick="copyCode(2)">copy</button>
+      <div>
+        <span class="t-comment"># Custom pipeline: only specific transforms</span><br>
+        <span class="t-cmd">.\obfusps.exe</span> <span class="t-flag">-i</span> script.ps1 <span class="t-flag">-o</span> out.ps1 <span class="t-flag">-level</span> 5 <span class="t-flag">-pipeline</span> <span class="t-path">"iden,strenc,numenc"</span> <span class="t-flag">-iden</span> obf <span class="t-flag">-strenc</span> rc4 <span class="t-flag">-numenc</span><br><br>
+        <span class="t-comment"># Full transform chain</span><br>
+        <span class="t-comment"># iden → strenc → stringdict → numenc → fmt → cf-opaque → cf-shuffle → dead</span><br>
+        <span class="t-cmd">.\obfusps.exe</span> <span class="t-flag">-i</span> script.ps1 <span class="t-flag">-o</span> out.ps1 <span class="t-flag">-level</span> 5 <span class="t-flag">-iden</span> obf <span class="t-flag">-strenc</span> rc4 <span class="t-flag">-stringdict</span> 60 <span class="t-flag">-numenc</span> <span class="t-flag">-fmt</span> jitter <span class="t-flag">-cf-opaque</span> <span class="t-flag">-cf-shuffle</span> <span class="t-flag">-deadcode</span> 30<br><br>
+        <span class="t-comment"># Stdin/stdout pipeline</span><br>
+        Get-Content script.ps1 | <span class="t-cmd">.\obfusps.exe</span> <span class="t-flag">-stdin</span> <span class="t-flag">-stdout</span> <span class="t-flag">-level</span> 5 <span class="t-flag">-q</span> > out.ps1
+      </div>
+    </div>
+    <div class="code-block" id="tab3">
+      <button class="copy-btn" onclick="copyCode(3)">copy</button>
+      <div>
+        <span class="t-comment">// Programmatic Go API</span><br>
+        <span class="t-flag">import</span> <span class="t-path">"github.com/benzoXdev/obfusps/pkg/obfusps"</span><br><br>
+        result, err := obfusps.<span class="t-cmd">Obfuscate</span>(sourceCode, obfusps.Config{<br>
+        &nbsp;&nbsp;<span class="t-flag">Level</span>:   5,<br>
+        &nbsp;&nbsp;<span class="t-flag">Profile</span>: <span class="t-path">"balanced"</span>,<br>
+        &nbsp;&nbsp;<span class="t-flag">Seed</span>:    42,<br>
+        })<br><br>
+        <span class="t-comment">// Install via Go</span><br>
+        go install <span class="t-path">github.com/benzoXdev/obfusps/cmd/obfusps@latest</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ARCHITECTURE -->
+<div class="arch-section">
+  <div class="arch-inner">
+    <div class="section-tag">Engine internals</div>
+    <h2 class="section-title">MULTI-LANGUAGE ARCHITECTURE</h2>
+    <p class="section-desc">The Go engine never embeds PowerShell logic. All runtime behavior lives in generated stubs. The engine produces text only — it does not interpret or execute PowerShell.</p>
+    <div class="arch-flow" style="margin-top:2.5rem;">
+      <div class="arch-node">INPUT (.ps1)</div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-node highlight">Smart Analysis</div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-node">Pipeline Transforms</div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-node highlight">Packer (L1–L5)</div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-node">Validate</div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-node">OUTPUT (.ps1)</div>
+    </div>
+    <div class="arch-tech-grid">
+      <div class="tech-card">
+        <div class="tech-lang">Go</div>
+        <div class="tech-role">Core Engine</div>
+        <div class="tech-desc">Parsing, pipeline, packers, RNG, I/O. Single binary — zero dependency, cross-platform, fast.</div>
+      </div>
+      <div class="tech-card">
+        <div class="tech-lang">PS</div>
+        <div class="tech-role">Runtime + AST</div>
+        <div class="tech-desc">Script runtime and native AST parsing via System.Management.Automation.Language.</div>
+      </div>
+      <div class="tech-card">
+        <div class="tech-lang">C#</div>
+        <div class="tech-role">AST Fallback</div>
+        <div class="tech-desc">.NET 8 AST parser for Windows environments without pwsh. CI/build compatible.</div>
+      </div>
+      <div class="tech-card">
+        <div class="tech-lang">Py</div>
+        <div class="tech-role">GUI + Test Harness</div>
+        <div class="tech-desc">4-mode Python GUI: AUTO, MANUAL, RECOMMEND, COMMAND. Full test harness.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- INSTALL -->
+<div class="install-section" id="install">
+  <div>
+    <div class="section-tag">Get started</div>
+    <h2 class="section-title">INSTALLATION</h2>
+    <p class="section-desc" style="margin-bottom:0">Get up and running in under 2 minutes. Requires Go 1.24+ and PowerShell 5.1 or 7.x.</p>
+    <div class="install-steps">
+      <div class="install-step">
+        <div class="step-num">01</div>
+        <div>
+          <div class="step-title">Clone the repository</div>
+          <div class="step-code"><span class="t-cmd">git clone</span> <span class="t-path">https://github.com/BenzoXdev/ObfusPS.git</span></div>
+        </div>
+      </div>
+      <div class="install-step">
+        <div class="step-num">02</div>
+        <div>
+          <div class="step-title">Build the binary</div>
+          <div class="step-code"><span class="t-cmd">go build</span> <span class="t-flag">-o</span> obfusps.exe ./cmd/obfusps</div>
+        </div>
+      </div>
+      <div class="install-step">
+        <div class="step-num">03</div>
+        <div>
+          <div class="step-title">Run your first obfuscation</div>
+          <div class="step-code"><span class="t-cmd">.\obfusps.exe</span> <span class="t-flag">-i</span> script.ps1 <span class="t-flag">-o</span> out.ps1 <span class="t-flag">-auto</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div>
+    <div style="margin-top:4.5rem;">
+      <div class="terminal">
+        <div class="terminal-bar">
+          <div class="t-dot t-red"></div>
+          <div class="t-dot t-yellow"></div>
+          <div class="t-dot t-green"></div>
+          <span class="terminal-title">ObfusPS-Tool.py — Python GUI</span>
+        </div>
+        <div class="terminal-body">
+          <div><span class="t-comment"># Install &amp; launch the Python GUI</span></div>
+          <div><span class="t-prompt">$</span> <span class="t-cmd">pip install</span> colorama &amp;&amp; <span class="t-cmd">python</span> ObfusPS-Tool.py</div>
+          <br>
+          <div style="color:#00b8e0;">╔══ Mode ════════════════════════════════════════════════╗</div>
+          <div><span style="color:#00b8e0;">║</span>  <span class="t-green-text">[0]</span> <span style="color:#fff;">AUTO</span>       <span style="color:#ffd700;">(smart — auto-detect best settings)   </span><span style="color:#00b8e0;">║</span></div>
+          <div><span style="color:#00b8e0;">║</span>  <span class="t-flag">[M]</span> <span style="color:#fff;">MANUAL</span>     (choose level + profile manually)   <span style="color:#00b8e0;">║</span></div>
+          <div><span style="color:#00b8e0;">║</span>  <span class="t-flag">[C]</span> <span style="color:#fff;">COMMAND</span>    (type raw flags / full control)     <span style="color:#00b8e0;">║</span></div>
+          <div><span style="color:#00b8e0;">║</span>  <span class="t-flag">[R]</span> <span style="color:#fff;">RECOMMEND</span>  (analyze script, no obfuscation)   <span style="color:#00b8e0;">║</span></div>
+          <div style="color:#00b8e0;">╚════════════════════════════════════════════════════════╝</div>
+          <br>
+          <div><span class="t-output">✓ ObfusPS v1.2.0 — Go 1.24 | PS 5.1 &amp; 7.x | Python 3.x</span></div>
+          <div><span class="t-output">✓ 650/650 tests passing — 0 regressions</span></div>
+          <div><span class="t-output">✓ Output: ObfusPS/Script-Obfuscate/</span></div>
+          <div><span class="t-prompt">$</span> <span class="cursor"></span></div>
+        </div>
+      </div>
+      <div class="legal-banner">
+        <span class="icon">⚠</span>
+        <span>For <strong>research and authorized testing only</strong>. You are solely responsible for proper use. Licensed under Apache-2.0.</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- GUI MODES -->
+<div style="background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:7rem 3rem;" id="gui">
+  <div style="max-width:1300px;margin:0 auto;">
+    <div class="section-tag">Python GUI</div>
+    <h2 class="section-title">4 OPERATING MODES</h2>
+    <p class="section-desc">ObfusPS-Tool.py wraps the Go engine with a user-friendly CLI interface including file picker, colored output, progress tracking, and error hints.</p>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border:1px solid var(--border);margin-top:3rem;">
+      <div class="feature-card" style="border:none;">
+        <div class="feature-icon green" style="font-size:1.3rem;">0</div>
+        <div class="feature-num">AUTO</div>
+        <div class="feature-title">Smart Auto-Detection</div>
+        <div class="feature-desc">Engine runs <code style="color:var(--accent);font-family:var(--mono);font-size:0.78rem;">-auto -auto-retry -validate</code>. Analyzes complexity, picks best profile &amp; level. No config needed.</div>
+      </div>
+      <div class="feature-card" style="border:none;">
+        <div class="feature-icon" style="font-size:1rem;">M</div>
+        <div class="feature-num">MANUAL</div>
+        <div class="feature-title">Level + Profile Menu</div>
+        <div class="feature-desc">Interactive menu to choose obfuscation level (1–5), profile (1–10), AST mode, and validation. Ideal for fine-grained control.</div>
+      </div>
+      <div class="feature-card" style="border:none;">
+        <div class="feature-icon red" style="font-size:1rem;">C</div>
+        <div class="feature-num">COMMAND</div>
+        <div class="feature-title">Raw CLI Flags</div>
+        <div class="feature-desc">Type any combination of flags directly. <code style="color:var(--accent);font-family:var(--mono);font-size:0.78rem;">-i</code> and <code style="color:var(--accent);font-family:var(--mono);font-size:0.78rem;">-o</code> are auto-filled. Full flag reference shown inline.</div>
+      </div>
+      <div class="feature-card" style="border:none;">
+        <div class="feature-icon green" style="font-size:1rem;">R</div>
+        <div class="feature-num">RECOMMEND</div>
+        <div class="feature-title">Script Analyzer</div>
+        <div class="feature-desc">Runs <code style="color:var(--accent);font-family:var(--mono);font-size:0.78rem;">-recommend</code> on each file. Prints complexity score, feature detection, best settings — no transformation.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FLAGS REFERENCE -->
+<div style="padding:7rem 3rem;" id="flags">
+  <div style="max-width:1300px;margin:0 auto;">
+    <div class="section-tag">Complete reference</div>
+    <h2 class="section-title">ALL CLI FLAGS</h2>
+    <p class="section-desc">Every flag supported by the engine. Explicit flags always override profile defaults.</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-top:3rem;">
+
+      <div style="background:#060a0f;border:1px solid var(--border-bright);padding:1.75rem;clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,12px 100%,0 calc(100% - 12px));">
+        <div style="font-family:var(--mono);font-size:0.65rem;text-transform:uppercase;letter-spacing:0.15em;color:var(--accent);margin-bottom:1.25rem;padding-bottom:0.75rem;border-bottom:1px solid var(--border);">── Core</div>
+        <div class="flag-row"><span class="flag-name">-level 1..5</span><span class="flag-desc">Obfuscation level — 1=Char Join → 5=GZip+XOR+Frag</span></div>
+        <div class="flag-row"><span class="flag-name">-profile &lt;n&gt;</span><span class="flag-desc">Preset: safe | light | balanced | heavy | stealth | paranoid | redteam | blueteam | size | dev</span></div>
+        <div class="flag-row"><span class="flag-name">-layers &lt;L,...&gt;</span><span class="flag-desc">AST, Flow, Encoding, Runtime — high-level shortcuts</span></div>
+        <div class="flag-row"><span class="flag-name">-pipeline &lt;t,...&gt;</span><span class="flag-desc">iden, strenc, stringdict, numenc, fmt, cf-opaque, cf-shuffle, dead</span></div>
+      </div>
+
+      <div style="background:#060a0f;border:1px solid var(--border-bright);padding:1.75rem;clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,12px 100%,0 calc(100% - 12px));">
+        <div style="font-family:var(--mono);font-size:0.65rem;text-transform:uppercase;letter-spacing:0.15em;color:var(--accent2);margin-bottom:1.25rem;padding-bottom:0.75rem;border-bottom:1px solid var(--border);">── Encoding Transforms</div>
+        <div class="flag-row"><span class="flag-name">-strenc off|xor|rc4</span><span class="flag-desc">String encryption mode — XOR or RC4 cipher</span></div>
+        <div class="flag-row"><span class="flag-name">-strkey &lt;hex&gt;</span><span class="flag-desc">Hex key for -strenc (e.g. a1b2c3d4)</span></div>
+        <div class="flag-row"><span class="flag-name">-stringdict 0..100</span><span class="flag-desc">String tokenization percentage (split strings into array)</span></div>
+        <div class="flag-row"><span class="flag-name">-numenc</span><span class="flag-desc">Replace numbers with arithmetic/bitwise expressions</span></div>
+        <div class="flag-row"><span class="flag-name">-iden obf|keep</span><span class="flag-desc">Identifier morphing — obf=rename vars &amp; functions</span></div>
+        <div class="flag-row"><span class="flag-name">-fmt off|jitter</span><span class="flag-desc">Whitespace randomization jitter</span></div>
+      </div>
+
+      <div style="background:#060a0f;border:1px solid var(--border-bright);padding:1.75rem;clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,12px 100%,0 calc(100% - 12px));">
+        <div style="font-family:var(--mono);font-size:0.65rem;text-transform:uppercase;letter-spacing:0.15em;color:var(--accent3);margin-bottom:1.25rem;padding-bottom:0.75rem;border-bottom:1px solid var(--border);">── Flow Transforms</div>
+        <div class="flag-row"><span class="flag-name">-cf-opaque</span><span class="flag-desc">Wrap code in always-true opaque predicates</span></div>
+        <div class="flag-row"><span class="flag-name">-cf-shuffle</span><span class="flag-desc">Reorder contiguous function groups</span></div>
+        <div class="flag-row"><span class="flag-name">-deadcode 0..100</span><span class="flag-desc">Dead-code injection probability</span></div>
+        <div class="flag-row"><span class="flag-name">-flow-unsafe</span><span class="flag-desc">Disable FlowSafeMode (redteam/paranoid only)</span></div>
+        <div class="flag-row"><span class="flag-name">-anti-reverse</span><span class="flag-desc">Inject anti-debug / sandbox detection at runtime</span></div>
+      </div>
+
+      <div style="background:#060a0f;border:1px solid var(--border-bright);padding:1.75rem;clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,12px 100%,0 calc(100% - 12px));">
+        <div style="font-family:var(--mono);font-size:0.65rem;text-transform:uppercase;letter-spacing:0.15em;color:var(--accent);margin-bottom:1.25rem;padding-bottom:0.75rem;border-bottom:1px solid var(--border);">── Level 5 / Fragmentation</div>
+        <div class="flag-row"><span class="flag-name">-frag profile=&lt;p&gt;</span><span class="flag-desc">tight | medium | loose | pro</span></div>
+        <div class="flag-row"><span class="flag-name">-minfrag N</span><span class="flag-desc">Minimum fragment count (default 10)</span></div>
+        <div class="flag-row"><span class="flag-name">-maxfrag N</span><span class="flag-desc">Maximum fragment count (default 20, max 256)</span></div>
+        <div class="flag-row"><span class="flag-name">-no-integrity</span><span class="flag-desc">Disable SHA-256 integrity check (default=true)</span></div>
+      </div>
+
+      <div style="background:#060a0f;border:1px solid var(--border-bright);padding:1.75rem;clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,12px 100%,0 calc(100% - 12px));">
+        <div style="font-family:var(--mono);font-size:0.65rem;text-transform:uppercase;letter-spacing:0.15em;color:var(--accent2);margin-bottom:1.25rem;padding-bottom:0.75rem;border-bottom:1px solid var(--border);">── Validation</div>
+        <div class="flag-row"><span class="flag-name">-validate</span><span class="flag-desc">Compare original vs obfuscated stdout / stderr / exit code</span></div>
+        <div class="flag-row"><span class="flag-name">-auto-retry</span><span class="flag-desc">Auto-retry up to 5× with progressively safer settings</span></div>
+        <div class="flag-row"><span class="flag-name">-validate-args "..."</span><span class="flag-desc">Arguments passed to script during validation</span></div>
+        <div class="flag-row"><span class="flag-name">-validate-stderr &lt;m&gt;</span><span class="flag-desc">strict | ignore (default=strict)</span></div>
+        <div class="flag-row"><span class="flag-name">-validate-timeout N</span><span class="flag-desc">Timeout in seconds (default=30)</span></div>
+      </div>
+
+      <div style="background:#060a0f;border:1px solid var(--border-bright);padding:1.75rem;clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,12px 100%,0 calc(100% - 12px));">
+        <div style="font-family:var(--mono);font-size:0.65rem;text-transform:uppercase;letter-spacing:0.15em;color:var(--accent3);margin-bottom:1.25rem;padding-bottom:0.75rem;border-bottom:1px solid var(--border);">── Smart / AST / Output</div>
+        <div class="flag-row"><span class="flag-name">-auto</span><span class="flag-desc">Auto-detect best profile, level, flags from script analysis</span></div>
+        <div class="flag-row"><span class="flag-name">-recommend</span><span class="flag-desc">Print analysis &amp; recommendations — no transformation</span></div>
+        <div class="flag-row"><span class="flag-name">-use-ast</span><span class="flag-desc">Native PowerShell AST (requires pwsh)</span></div>
+        <div class="flag-row"><span class="flag-name">-context-aware</span><span class="flag-desc">Skip strenc for IEX / Add-Type / ScriptBlock::Create</span></div>
+        <div class="flag-row"><span class="flag-name">-module-aware</span><span class="flag-desc">Protect Export-ModuleMember and dot-sourced imports</span></div>
+        <div class="flag-row"><span class="flag-name">-seed N</span><span class="flag-desc">RNG seed — 0=random, N=reproducible (CI/CD)</span></div>
+        <div class="flag-row"><span class="flag-name">-fuzz N</span><span class="flag-desc">Generate N polymorphic variants</span></div>
+        <div class="flag-row"><span class="flag-name">-report</span><span class="flag-desc">Emit full obfuscation report</span></div>
+        <div class="flag-row"><span class="flag-name">-dry-run</span><span class="flag-desc">Analyze only — no output file written</span></div>
+        <div class="flag-row"><span class="flag-name">-q</span><span class="flag-desc">Quiet mode — no banner printed</span></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- LIVE DEMO -->
+<div class="demo-section-wrap" id="demo">
+  <div class="demo-section-inner">
+
+    <div class="section-tag">Live demo</div>
+    <h2 class="section-title">WATCH IT WORK</h2>
+    <p class="section-desc" style="margin-bottom:2.5rem;">
+      <code style="font-family:var(--mono);color:var(--accent);font-size:0.9rem;">Write-Output "Hello World"</code>
+      obfuscated in real-time — Level 5, balanced profile, seed=424242.
+    </p>
+
+    <!-- MODE SELECTOR BOX -->
+    <div class="mode-selector">
+      <pre>
+                                                <span class="ms-border">╔════════════════════════════════════════════════════════════════╗</span>
+                                                <span class="ms-border">║</span>                       <span class="ms-title"> SELECT MODE</span>                      <span class="ms-border">║</span>
+                                                <span class="ms-border">╠════════════════════════════════════════════════════════════════╣</span>
+                                                <span class="ms-border">║</span>                                                         <span class="ms-border">  ║</span>
+                                                <span class="ms-border">║</span>   <span class="ms-key-0">[0]</span>  <span class="ms-label">AUTO        </span><span class="ms-desc">Smart — auto-detect best settings   </span> <span class="ms-border">  ║</span>
+                                                <span class="ms-border">║</span>   <span class="ms-key-mcr">[M]</span>  <span class="ms-label">MANUAL      </span><span class="ms-desc">Choose level + profile manually     </span> <span class="ms-border">  ║</span>
+                                                <span class="ms-border">║</span>   <span class="ms-key-mcr">[C]</span>  <span class="ms-label">COMMAND     </span><span class="ms-desc">Type raw flags / full control       </span> <span class="ms-border">  ║</span>
+                                                <span class="ms-border">║</span>   <span class="ms-key-mcr">[R]</span>  <span class="ms-label">RECOMMEND   </span><span class="ms-desc">Analyze script, no obfuscation      </span> <span class="ms-border">  ║</span>
+                                                <span class="ms-border">║</span>                                                         <span class="ms-border">  ║</span>
+                                                <span class="ms-border">╚════════════════════════════════════════════════════════════════╝</span>
+</pre>
+      <div style="font-family:var(--mono);font-size:0.68rem;margin-top:0.5rem;display:flex;align-items:center;gap:0.75rem;">
+        <span style="color:var(--text-dim);">Mode selected:</span>
+        <span style="color:#7fff00;font-weight:700;letter-spacing:0.08em;">[0] AUTO</span>
+        <span style="color:var(--text-dim);">— engine auto-detect · level=5 · profile=balanced · seed=424242</span>
+        <span style="display:inline-block;width:7px;height:12px;background:var(--accent);vertical-align:middle;animation:dCursorBlink 0.9s step-end infinite;margin-left:4px;"></span>
+      </div>
+    </div>
+
+    <!-- DEMO WIDGET -->
+    <div class="demo-inner-wrap">
+
+      <div class="d-transform-label">
+        <div class="d-tl-line"></div>
+        <div class="d-tl-text">
+          <span style="color:#39ff6a;">●</span>&nbsp;INPUT · 30 bytes · 1 line
+          &nbsp;→&nbsp;
+          <span style="color:#ff3e6c;">●</span>&nbsp;OUTPUT · 1847 bytes · 2 lines · seed=424242
+        </div>
+        <div class="d-tl-line r"></div>
+      </div>
+
+      <div class="d-panels">
+
+        <!-- INPUT -->
+        <div class="d-panel d-panel-l">
+          <div class="d-panel-hdr">
+            <div class="d-dots"><div class="d-dot d-dot-r"></div><div class="d-dot d-dot-y"></div><div class="d-dot d-dot-g"></div></div>
+            <div class="d-pname">hello.ps1</div>
+            <div class="d-pbadge d-badge-i">Input</div>
+          </div>
+          <div class="d-panel-body">
+            <div class="d-input-code">
+              <div><span class="d-lnum">1</span><span class="d-kw">Write-Output</span> <span class="d-str">"Hello World"</span></div>
+            </div>
+            <div class="d-meta">
+              <div class="d-mrow"><span>Size</span><span class="d-mval">30 bytes</span></div>
+              <div class="d-mrow"><span>Lines</span><span class="d-mval">1</span></div>
+              <div class="d-mrow"><span>Encoding</span><span class="d-mval">UTF-8</span></div>
+              <div class="d-mrow"><span>Complexity</span><span class="d-mval" style="color:#39ff6a;">3 / 100</span></div>
+              <div class="d-mrow"><span>Profile</span><span class="d-mval" style="color:var(--accent);">balanced</span></div>
+              <div class="d-mrow"><span>Level</span><span class="d-mval" style="color:var(--accent);">5 — GZip+XOR+Frag</span></div>
+              <div class="d-mrow"><span>Fragments</span><span class="d-mval">25 (Fisher-Yates)</span></div>
+              <div class="d-mrow"><span>Seed</span><span class="d-mval" style="color:#ffd43b;">424242</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ARROW -->
+        <div class="d-arrow">
+          <div class="d-apipe"></div>
+          <div class="d-abox">⚡</div>
+          <div class="d-apipe"></div>
+        </div>
+
+        <!-- OUTPUT -->
+        <div class="d-panel d-panel-r">
+          <div class="d-panel-hdr">
+            <div class="d-dots"><div class="d-dot d-dot-r"></div><div class="d-dot d-dot-y"></div><div class="d-dot d-dot-g"></div></div>
+            <div class="d-pname">out.ps1</div>
+            <div class="d-pbadge d-badge-o">Output</div>
+          </div>
+          <div class="d-panel-body">
+            <div class="d-output-scroll">
+              <div class="d-output-code" id="d-output-code"></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- STATS -->
+      <div class="d-stats" id="d-stats" style="opacity:0;transition:opacity 0.5s ease;">
+        <div class="d-stat"><span class="d-sval cyan">1847</span><span class="d-slbl">bytes out</span></div>
+        <div class="d-stat"><span class="d-sval yellow">6.1×</span><span class="d-slbl">size ratio</span></div>
+        <div class="d-stat"><span class="d-sval green">5.21</span><span class="d-slbl">entropy</span></div>
+        <div class="d-stat"><span class="d-sval red">25</span><span class="d-slbl">fragments</span></div>
+        <div class="d-stat"><span class="d-sval cyan">58</span><span class="d-slbl">unique chars</span></div>
+      </div>
+
+      <!-- VALIDATION -->
+      <div class="d-vbar" id="d-vbar" style="opacity:0;transition:opacity 0.5s ease;">
+        <div class="d-vcheck"><div class="d-vdot"></div> stdout ✓</div>
+        <div class="d-vsep">|</div>
+        <div class="d-vcheck"><div class="d-vdot"></div> stderr ✓</div>
+        <div class="d-vsep">|</div>
+        <div class="d-vcheck"><div class="d-vdot"></div> exit_code ✓</div>
+        <div class="d-vsep">|</div>
+        <div class="d-vcheck" style="color:var(--accent);">
+          <div class="d-vdot" style="background:var(--accent);"></div>
+          validation pass
+        </div>
+      </div>
+
+      <!-- PROGRESS -->
+      <div class="d-progress"><div class="d-pfill" id="d-pfill"></div></div>
+
+      <!-- REPLAY -->
+      <div class="d-replay-wrap">
+        <button class="d-replay-btn" id="d-replay-btn" onclick="dStartDemo()">
+          <span>↺</span> Replay demo
+        </button>
+      </div>
+
+    </div><!-- /demo-inner-wrap -->
+  </div><!-- /demo-section-inner -->
+</div><!-- /demo-section-wrap -->
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div>
+        <div class="footer-brand-name">ObfusPS</div>
+        <div class="footer-brand-desc">Advanced PowerShell Obfuscation Engine. Built on Go, PowerShell, C#, and Python. Research and authorized testing only.</div>
+        <div style="margin-top:1.5rem; display:flex; gap:0.5rem; flex-wrap:wrap;">
+          <span class="badge">Go core</span>
+          <span class="badge">v1.2.0</span>
+          <span class="badge red">Research only</span>
+          <span class="badge">Apache-2.0</span>
+        </div>
+      </div>
+      <div>
+        <div class="footer-col-title">Navigation</div>
+        <ul class="footer-links">
+          <li><a href="#features">Features</a></li>
+          <li><a href="#levels">Obfuscation Levels</a></li>
+          <li><a href="#profiles">Profiles</a></li>
+          <li><a href="#usage">Usage Examples</a></li>
+          <li><a href="#gui">Python GUI Modes</a></li>
+          <li><a href="#flags">CLI Flags Reference</a></li>
+          <li><a href="#demo">Live Demo</a></li>
+          <li><a href="#install">Installation</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-col-title">Links</div>
+        <ul class="footer-links">
+          <li><a href="https://github.com/BenzoXdev/ObfusPS" target="_blank">GitHub Repository</a></li>
+          <li><a href="https://github.com/BenzoXdev/ObfusPS/releases" target="_blank">Releases</a></li>
+          <li><a href="https://github.com/BenzoXdev/ObfusPS/blob/main/docs/DOCUMENTATION.md" target="_blank">Documentation</a></li>
+          <li><a href="https://github.com/BenzoXdev/ObfusPS/blob/main/docs/BEST_PRACTICES.md" target="_blank">Best Practices</a></li>
+          <li><a href="https://github.com/BenzoXdev/ObfusPS/blob/main/docs/ARCHITECTURE_MULTILANG.md" target="_blank">Architecture</a></li>
+          <li><a href="https://t.me/benzoXdev" target="_blank">Telegram</a></li>
+          <li><a href="https://instagram.com/just._.amar_x1" target="_blank">Instagram</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-col-title">Legal</div>
+        <ul class="footer-links">
+          <li><a href="https://github.com/BenzoXdev/ObfusPS/blob/main/LICENSE" target="_blank">Apache-2.0 License</a></li>
+          <li><a href="#">Usage Policy</a></li>
+          <li><a href="#">Responsible Use</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-copy">© 2025–2026 BenzoXdev — ObfusPS v1.2.0 — For research & authorized use only</div>
+      <div class="footer-badges">
+        <span class="badge">650/650 tests ✓</span>
+        <span class="badge">0 dependencies</span>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // ── HERO DEMO TABS ──
+  function showSlide(index) {
+    document.querySelectorAll('.demo-slide').forEach((s, i) => {
+      s.style.display = i === index ? 'block' : 'none';
+    });
+    document.querySelectorAll('.demo-tab').forEach((t, i) => {
+      t.classList.toggle('active-tab', i === index);
+    });
+  }
+
+  // Auto-cycle through slides every 5 seconds
+  let currentSlide = 0;
+  const totalSlides = 4;
+  let autoCycle = setInterval(() => {
+    currentSlide = (currentSlide + 1) % totalSlides;
+    showSlide(currentSlide);
+  }, 5000);
+
+  // Stop auto-cycle when user manually clicks
+  document.querySelectorAll('.demo-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      clearInterval(autoCycle);
+    });
+  });
+
+  // ── TAB SWITCHING (usage section) ──
+  function switchTab(index) {
+    document.querySelectorAll('.code-tab').forEach((t, i) => t.classList.toggle('active', i === index));
+    document.querySelectorAll('.code-block').forEach((b, i) => b.classList.toggle('active', i === index));
+  }
+
+  // ── COPY CODE ──
+  function copyCode(index) {
+    const block = document.getElementById('tab' + index);
+    const text = block.innerText.replace(/^copy\n/, '');
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = block.querySelector('.copy-btn');
+      btn.textContent = 'copied!';
+      btn.style.color = 'var(--accent3)';
+      btn.style.borderColor = 'var(--accent3)';
+      setTimeout(() => { btn.textContent = 'copy'; btn.style.color = ''; btn.style.borderColor = ''; }, 2000);
+    });
+  }
+
+  // ── SCROLL REVEAL ──
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.style.opacity = '1'; e.target.style.transform = 'translateY(0)'; }
+    });
+  }, { threshold: 0.08 });
+
+  document.querySelectorAll('.feature-card, .level-item, .profile-card, .tech-card, .install-step, .flag-row').forEach(el => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(18px)';
+    el.style.transition = 'opacity 0.45s ease, transform 0.45s ease';
+    observer.observe(el);
+  });
+  document.querySelectorAll('.feature-card').forEach((el, i) => { el.style.transitionDelay = (i * 0.06) + 's'; });
+  document.querySelectorAll('.profile-card').forEach((el, i) => { el.style.transitionDelay = (i * 0.04) + 's'; });
+  document.querySelectorAll('.flag-row').forEach((el, i) => { el.style.transitionDelay = (i * 0.015) + 's'; });
+
+  // ── NAV SCROLL ──
+  const nav = document.querySelector('nav');
+  window.addEventListener('scroll', () => {
+    nav.style.borderBottomColor = window.scrollY > 50 ? 'var(--border-bright)' : 'var(--border)';
+  });
+
+  // ══════════════════════════════════════
+  //  LIVE DEMO ENGINE
+  // ══════════════════════════════════════
+  const D_OUTPUT = `[Console]::OutputEncoding = [Text.Encoding]::UTF8; $OutputEncoding = [Text.Encoding]::UTF8; $aJAWwC = @('/nm/LuepXx','M+K7HEdN6s','exntR0nSVWVRf','l8NgpnX1aPh+','7glOQCur+bMHwM','qwl71hrNNnbfrw','2NwwdKkq45FDLxd7w1','sys183iO20','/oe3x0NLAJxb71Qju','nQ==','NLYsU3l/Rhdmzh','4s6fXI653mGE9','EzADUxp7xC','S4zYbsgedua','8b4/MJepuu','KblgV1ccgs1lZpwcA','tsJhhaQtMsoB/','ycjXxA/8tdu/t','+Y3NkK/0KwW','cY+khNd9aoi0YUw','ovESaiqXNDzPbA','Yc7u/sRZTOyIt','ZPdEwrAPXFux','9NFB2FEZgEXZYkCpB','5egSRVT+H8L'); $tDdZs = 1218952262; $HimyX = 3; $DWOQP = $HimyX * 2; $djJNG = 1; $djJNG = 2; $dzvgN = New-Object byte[] 32; $k = 1009415203 -band 0x7FFFFFFF; 0..31 | ForEach-Object { $k = (([long]$k * 1103515245 + 12345) -band 0x7FFFFFFF); $dzvgN[$_] = [byte](($k -shr 16) -band 0xFF) }; $FAMvQ = 3; $pGWot = $FAMvQ * 2; $JIMxw = 10 -gt 139; $SMHOA = -join ([char[]](70,114,111,109,66,97,115,101,54,52,83,116,114,105,110,103)); $XXlHO = [Convert].GetMethod($SMHOA, [Type[]]@([string])).Invoke($null, @('AxUEAAoHEgsQGAYUDBECCQ8IDg0TFgUBFw==')); $bFvcK = New-Object int[] 25; 0..24 | ForEach-Object { $bFvcK[$XXlHO[$_]] = $_ }; $gcusmt = -join (0..24 | ForEach-Object { $aJAWwC[$bFvcK[$_]] }); $drqaO = [Convert].GetMethod($SMHOA, [Type[]]@([string])).Invoke($null, @($gcusmt)); for($i=0;$i -lt $drqaO.Length;$i++){ $drqaO[$i] = $drqaO[$i] -bxor $dzvgN[$i%$dzvgN.Length] }; $tqZXE = New-Object IO.MemoryStream(,$drqaO); $qQxRm = New-Object IO.Compression.GzipStream($tqZXE,[IO.Compression.CompressionMode]::Decompress); $imuRq = New-Object IO.StreamReader($qQxRm,[Text.Encoding]::UTF8); $AzMdWB = $imuRq.ReadToEnd(); ; & { if(34 -le 62){ $vxICj = 1; $vxICj = 2; $yvspW = 1; $yvspW = 2; & ([scriptblock]::Create($AzMdWB)) @args } }
+# ObfusPS by BenzoXdev | seed=424242`;
+
+  let dTimer = null, dIdx = 0, dStarted = false;
+
+  function dColorize(text) {
+    let s = text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    s = s.replace(/(#[^\n&]*)/g,     '<span class="oc-seed">$1</span>');
+    s = s.replace(/'([^']*)'/g,       '<span class="oc-str">\'$1\'</span>');
+    s = s.replace(/"([^"]*)"/g,       '<span class="oc-str">"$1"</span>');
+    s = s.replace(/\$([A-Za-z_][A-Za-z0-9_]*)/g, '<span class="oc-var">$$$1</span>');
+    s = s.replace(/\[([A-Za-z\.]+)\]::/g,         '<span class="oc-fn">[$1]::</span>');
+    s = s.replace(/\[([A-Za-z\.\[\]\s,]+)\]/g,    '<span class="oc-kw">[$1]</span>');
+    s = s.replace(/\.([A-Za-z]+)\(/g,             '<span class="oc-method">.$1</span>(');
+    s = s.replace(/\b(New-Object|ForEach-Object|if|-band|-bxor|-shr|-gt|-lt|-le|-ge|byte|int|long|string)\b/g, '<span class="oc-op">$1</span>');
+    s = s.replace(/\b(\d{4,})\b/g,  '<span class="oc-num">$1</span>');
+    s = s.replace(/\|/g,             '<span class="oc-pipe">|</span>');
+    s = s.replace(/(@\(|\{|\})/g,    '<span class="oc-dim">$1</span>');
+    return s;
+  }
+
+  function dStartDemo() {
+    if (dTimer) clearInterval(dTimer);
+    dIdx = 0;
+    document.getElementById('d-output-code').innerHTML = '';
+    document.getElementById('d-stats').style.opacity = '0';
+    document.getElementById('d-vbar').style.opacity = '0';
+    document.getElementById('d-pfill').style.width = '0%';
+    const btn = document.getElementById('d-replay-btn');
+    btn.disabled = true; btn.style.opacity = '0.4';
+
+    const total = D_OUTPUT.length;
+    dTimer = setInterval(() => {
+      dIdx = Math.min(dIdx + 7, total);
+      document.getElementById('d-output-code').innerHTML =
+        dColorize(D_OUTPUT.slice(0, dIdx)) +
+        (dIdx < total ? '<span class="d-tw-cursor"></span>' : '');
+      document.getElementById('d-pfill').style.width = (dIdx / total * 100) + '%';
+      const sc = document.querySelector('.d-output-scroll');
+      if (sc) sc.scrollTop = sc.scrollHeight;
+      if (dIdx >= total) {
+        clearInterval(dTimer);
+        setTimeout(() => { document.getElementById('d-stats').style.opacity = '1'; }, 300);
+        setTimeout(() => { document.getElementById('d-vbar').style.opacity = '1'; }, 700);
+        btn.disabled = false; btn.style.opacity = '1';
+      }
+    }, 16);
+  }
+
+  // Auto-start once demo section scrolls into view
+  const demoSection = document.getElementById('demo');
+  if (demoSection) {
+    const demoObs = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting && !dStarted) {
+          dStarted = true;
+          setTimeout(dStartDemo, 400);
+        }
+      });
+    }, { threshold: 0.2 });
+    demoObs.observe(demoSection);
+  }
+</script>
+</body>
+</html>
