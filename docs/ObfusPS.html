@@ -2183,32 +2183,55 @@
             </div>
             <div style="font-family:var(--mono);font-size:0.65rem;padding:0.1rem 1rem;color:#c03040;">[<span style="color:#e8f4ff;">&gt;</span>] <span style="color:#c8d8e8;">Telegram : t.me/benzoXdev</span></div>
             <div style="font-family:var(--mono);font-size:0.65rem;padding:0.1rem 1rem 0.5rem;color:#c03040;">[<span style="color:#e8f4ff;">&gt;</span>] <span style="color:#c8d8e8;">Instagram : instagram.com/just._.amar_x1</span></div>
-            <pre style="border-top:1px solid #1a2332;padding:0.6rem 1rem;font-family:var(--mono);font-size:0.62rem;line-height:1.65;color:#c8d8e8;margin:0;white-space:pre;overflow:auto;max-height:420px;">[22:06:57] [>] | Mode (0=Auto/M=Manual/C=Command/R=Recommend, default=0) -&gt;
-[22:06:57] [!] | AUTO mode: engine will analyze script and auto-select best settings.
-[22:06:57] [~] | Removing previous folders..
-[22:06:57] [!] | Previous folders removed.
-[22:06:57] [!] | Creating folder: ObfusPS
-[22:06:57] [!] | File 1/1: helloworld.ps1
-[22:06:57] [!] | Copied: helloworld.ps1 -&gt; ObfusPS\Script\helloworld.ps1
-[22:06:57] [~] | File 1/1 - Obfuscating: helloworld.ps1..
-[22:06:57] [!] | ╔══ Script Analysis ═══════════════════════════════════════╗
-[22:06:57] [!] | ║  Lines: 1       Functions: 0     Classes: 0             ║
-[22:06:57] [!] | ║  Strings: 1      Complexity: 0/100                      ║
-[22:06:57] [!] | ╠══ Recommendation ════════════════════════════════════════╣
-[22:06:57] [!] | ║  → Profile: balanced    Level: 5                        ║
-[22:06:57] [!] | ╚═════════════════════════════════════════════════════════╝
-[22:06:57] [!] | Auto: selected profile balanced
-[22:06:57] [!] | Auto: selected level 5
-[22:06:57] [!] | Seed: 424242 (re-run with -seed 424242 for same output)
-[22:06:57] [!] | Metrics: size=1747 bytes | unique=87 | entropy=5.98 | alnum_ratio=0.66 | ratio=67.2x | lines=2
-[22:06:57] [!] | Wrote: ObfusPS\Script-Obfuscate\helloworld.ps1
-[22:06:57] [!] | Done in 2ms
-[22:06:57] [+] | Done: ObfusPS\Script-Obfuscate\helloworld.ps1
-[22:06:57] [!] | Obfuscation complete: 1 file(s) -&gt; ObfusPS\Script-Obfuscate
-[22:06:57] [!] | Scripts compatible with PowerShell 5.1 &amp; 7.x
-[22:06:57] [!] | Architecture: Go engine; -use-ast for native AST when pwsh available.
-[22:07:00] [>] | Press Enter to continue..</pre>
+            <div style="border-top:1px solid #1a2332;padding:0.6rem 1rem;font-family:var(--mono);font-size:0.65rem;">
+              <div><span style="color:#c03040;">[<span style="color:#e8f4ff;">05:12:07</span>]</span> <span style="color:#c03040;">[<span style="color:#e8f4ff;">!</span>]</span> <span style="color:#c8d8e8;"> AUTO mode: engine will analyze and auto-select best settings.</span></div>
+              <div style="margin-top:0.3rem;color:#5a7a9a;"># Input: Write-Output "Hello World"</div>
+              <div><span style="color:#c03040;">[<span style="color:#e8f4ff;">05:12:07</span>]</span> <span style="color:#c03040;">[<span style="color:#e8f4ff;">~</span>]</span> <span style="color:#c8d8e8;"> File 1/1 - Obfuscating: <span style="color:#fff;">hello.ps1</span></span></div>
+              <div style="color:#5aaa88;">  level=5 profile=balanced complexity=3</div>
+              <div style="color:#5aaa88;">  size=1847 bytes | unique=58 | entropy=5.21 | ratio=6.0x | lines=2</div>
+              <div style="color:#5aaa88;">  validation: pass</div>
+              <div><span style="color:#c03040;">[<span style="color:#e8f4ff;">05:12:08</span>]</span> <span style="color:#c03040;">[<span style="color:#e8f4ff;">+</span>]</span> <span style="color:#c8d8e8;"> Done: <span style="color:#fff;">ObfusPS/Script-Obfuscate/hello.ps1</span></span></div>
+              <div style="margin-top:0.4rem;color:#5a7a9a;border-top:1px solid #1a2332;padding-top:0.4rem;font-size:0.58rem;word-break:break-all;line-height:1.5;">[Console]::OutputEncoding = ...; <span style="color:#00d4ff;">$aJAWwC</span> = @(<span style="color:#ffd700;">'/nm/LuepXx','M+K7HEdN6s'</span>,...); <span style="color:#00d4ff;">$tDdZs</span> = 1218952262; <span style="color:#00d4ff;">$dzvgN</span> = New-Object byte[] 32; ... GzipStream ... <span style="color:#7fff00;">&amp; ([scriptblock]::Create($AzMdWB)) @args</span><br><span style="color:#1a2332;"># ObfusPS by BenzoXdev | seed=424242</span></div>
+            </div>
           </div>
+
+          <!-- SLIDE 1 — MANUAL mode -->
+          <div id="slide-1" class="demo-slide" style="display:none;">
+            <div style="font-family:var(--mono);font-size:0.65rem;padding:0.75rem 1rem;line-height:1.75;">
+              <div style="color:#5a7a9a;"># MANUAL mode selected</div>
+              <div style="margin-top:0.5rem;">
+                <span style="color:#c03040;">[<span style="color:#fff;">1</span>]</span> <span style="color:#c8d8e8;">Weak        (char join)</span><br>
+                <span style="color:#c03040;">[<span style="color:#fff;">2</span>]</span> <span style="color:#c8d8e8;">Medium      (Base64)</span><br>
+                <span style="color:#c03040;">[<span style="color:#fff;">3</span>]</span> <span style="color:#c8d8e8;">Strong      (Base64 + variable)</span><br>
+                <span style="color:#c03040;">[<span style="color:#fff;">4</span>]</span> <span style="color:#c8d8e8;">Very Strong (GZip + Base64)</span><br>
+                <span style="color:#c03040;">[<span style="color:#fff;">5</span>]</span> <span style="color:#c8d8e8;">Extreme     (GZip + XOR + fragmentation + noise)</span>
+              </div>
+              <div style="margin-top:0.6rem;color:#c03040;">Profiles:</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.1rem 1rem;margin-top:0.2rem;">
+                <div><span style="color:#c03040;">[1]</span> <span style="color:#7fff00;">safe</span>      <span style="color:#5a7a9a;">(compat / safe)</span></div>
+                <div><span style="color:#c03040;">[2]</span> <span style="color:#c8d8e8;">light</span>     <span style="color:#5a7a9a;">(light obfuscation)</span></div>
+                <div><span style="color:#c03040;">[3]</span> <span style="color:#c8d8e8;">balanced</span>  <span style="color:#5a7a9a;">(balanced / default)</span></div>
+                <div><span style="color:#c03040;">[4]</span> <span style="color:#ffd700;">heavy</span>     <span style="color:#5a7a9a;">(heavy obfuscation)</span></div>
+                <div><span style="color:#c03040;">[5]</span> <span style="color:#ffd700;">stealth</span>   <span style="color:#5a7a9a;">(stealth / evasion)</span></div>
+                <div><span style="color:#c03040;">[6]</span> <span style="color:#ff3e6c;">paranoid</span>  <span style="color:#5a7a9a;">(maximum paranoia)</span></div>
+                <div><span style="color:#c03040;">[7]</span> <span style="color:#ff3e6c;">redteam</span>   <span style="color:#5a7a9a;">(red-team ops)</span></div>
+                <div><span style="color:#c03040;">[8]</span> <span style="color:#00d4ff;">blueteam</span>  <span style="color:#5a7a9a;">(blue-team audit)</span></div>
+                <div><span style="color:#c03040;">[9]</span> <span style="color:#c8d8e8;">size</span>      <span style="color:#5a7a9a;">(minimize size)</span></div>
+                <div><span style="color:#c03040;">[10]</span> <span style="color:#c8d8e8;">dev</span>       <span style="color:#5a7a9a;">(dev / debug)</span></div>
+              </div>
+              <div style="margin-top:0.7rem;border-top:1px solid #1a2332;padding-top:0.5rem;">
+                <div><span style="color:#c03040;">[<span style="color:#e8f4ff;">05:12:10</span>]</span> <span style="color:#c03040;">[<span style="color:#e8f4ff;">&gt;</span>]</span> <span style="color:#c8d8e8;"> Obfuscation level (1-5, default=3) -&gt;</span> <span style="color:#e8f4ff;">5</span></div>
+                <div><span style="color:#c03040;">[<span style="color:#e8f4ff;">05:12:11</span>]</span> <span style="color:#c03040;">[<span style="color:#e8f4ff;">&gt;</span>]</span> <span style="color:#c8d8e8;"> Profile (1-10 or name, default=3/balanced) -&gt;</span> <span style="color:#e8f4ff;">6</span></div>
+                <div><span style="color:#c03040;">[<span style="color:#e8f4ff;">05:12:12</span>]</span> <span style="color:#c03040;">[<span style="color:#e8f4ff;">&gt;</span>]</span> <span style="color:#c8d8e8;"> Use native AST when available? [Y/n] -&gt;</span> <span style="color:#e8f4ff;">y</span></div>
+                <div><span style="color:#c03040;">[<span style="color:#e8f4ff;">05:12:13</span>]</span> <span style="color:#c03040;">[<span style="color:#e8f4ff;">&gt;</span>]</span> <span style="color:#c8d8e8;"> Validate output after obfuscation? [y/N] -&gt;</span> <span style="color:#e8f4ff;">y</span></div>
+                <div><span style="color:#c03040;">[<span style="color:#e8f4ff;">05:12:14</span>]</span> <span style="color:#c03040;">[<span style="color:#e8f4ff;">~</span>]</span> <span style="color:#c8d8e8;"> Obfuscating: <span style="color:#fff;">hello.ps1</span> [level=5, paranoid]</span></div>
+                <div style="color:#5aaa88;">  ✓ Validation: stdout ✓ stderr ✓ exit_code ✓</div>
+                <div style="color:#5aaa88;">  size=2341B | entropy=5.71 | ratio=7.8x</div>
+                <div><span style="color:#c03040;">[<span style="color:#e8f4ff;">05:12:15</span>]</span> <span style="color:#c03040;">[<span style="color:#e8f4ff;">+</span>]</span> <span style="color:#c8d8e8;"> Done: <span style="color:#fff;">ObfusPS/Script-Obfuscate/hello.ps1</span></span></div>
+              </div>
+            </div>
+          </div>
+
 
           <!-- SLIDE 1 — MANUAL mode -->
           <div id="slide-1" class="demo-slide" style="display:none;">
