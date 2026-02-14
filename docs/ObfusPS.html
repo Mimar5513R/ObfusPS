@@ -27,12 +27,35 @@
 
   html { scroll-behavior: smooth; }
 
+  [id] { scroll-margin-top: 84px; }
+
   body {
     background: var(--bg);
     color: var(--text);
     font-family: var(--body);
     line-height: 1.6;
     overflow-x: hidden;
+  }
+
+  /* AMBIENT MESH */
+  .ambient-bg {
+    position: fixed;
+    inset: -25%;
+    z-index: -1;
+    pointer-events: none;
+    background:
+      radial-gradient(900px 540px at 18% 18%, rgba(0, 212, 255, 0.10), transparent 60%),
+      radial-gradient(900px 540px at 88% 22%, rgba(255, 62, 108, 0.10), transparent 60%),
+      radial-gradient(900px 540px at 58% 86%, rgba(127, 255, 0, 0.06), transparent 60%);
+    filter: saturate(1.05);
+    opacity: 0.9;
+    transform: translate3d(0, 0, 0);
+    animation: ambientFloat 16s ease-in-out infinite alternate;
+  }
+
+  @keyframes ambientFloat {
+    from { transform: translate3d(-1.5%, -1%, 0) scale(1); }
+    to { transform: translate3d(1.5%, 1.2%, 0) scale(1.03); }
   }
 
   /* NOISE OVERLAY */
@@ -59,6 +82,13 @@
     background: rgba(8, 11, 15, 0.85);
     backdrop-filter: blur(20px);
     border-bottom: 1px solid var(--border);
+    transition: background 180ms ease, border-bottom-color 180ms ease, box-shadow 180ms ease;
+  }
+
+  nav.nav-scrolled {
+    background: rgba(8, 11, 15, 0.92);
+    border-bottom-color: var(--border-bright);
+    box-shadow: 0 14px 40px rgba(0,0,0,0.35);
   }
 
   .nav-logo {
@@ -88,10 +118,32 @@
     text-decoration: none;
     text-transform: uppercase;
     letter-spacing: 0.1em;
+    position: relative;
+    display: inline-block;
+    padding: 8px 0;
     transition: color 0.2s;
   }
 
   .nav-links a:hover { color: var(--accent); }
+
+  .nav-links a::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -8px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    transform: scaleX(0);
+    transform-origin: center;
+    opacity: 0;
+    transition: transform 200ms ease, opacity 200ms ease;
+  }
+
+  .nav-links a:hover::after { transform: scaleX(1); opacity: 1; }
+
+  .nav-links a.is-active { color: var(--text-bright); }
+  .nav-links a.is-active::after { transform: scaleX(1); opacity: 1; }
 
   .nav-cta {
     font-family: var(--mono);
@@ -106,13 +158,29 @@
     cursor: pointer;
     text-decoration: none;
     transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
     clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+  }
+
+  .nav-cta::after {
+    content: '';
+    position: absolute;
+    inset: -40%;
+    background: linear-gradient(120deg, transparent, rgba(255,255,255,0.22), transparent);
+    transform: translateX(-60%) rotate(12deg);
+    transition: transform 520ms ease;
+    pointer-events: none;
+    mix-blend-mode: screen;
   }
 
   .nav-cta:hover {
     background: var(--accent);
     color: var(--bg);
   }
+
+  .nav-cta:hover::after { transform: translateX(60%) rotate(12deg); }
 
   /* HERO */
   .hero {
@@ -132,6 +200,12 @@
       linear-gradient(90deg, rgba(0, 212, 255, 0.03) 1px, transparent 1px);
     background-size: 60px 60px;
     mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 20%, transparent 80%);
+    animation: gridDrift 22s linear infinite;
+  }
+
+  @keyframes gridDrift {
+    from { background-position: 0 0, 0 0; }
+    to { background-position: 60px 60px, 60px 60px; }
   }
 
   .hero-glow {
@@ -251,8 +325,22 @@
     text-decoration: none;
     cursor: pointer;
     border: none;
-    transition: all 0.25s;
+    transition: transform 0.22s ease, box-shadow 0.22s ease, background 0.22s ease;
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
     clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+  }
+
+  .btn-primary::after {
+    content: '';
+    position: absolute;
+    inset: -40%;
+    background: linear-gradient(120deg, transparent, rgba(255,255,255,0.26), transparent);
+    transform: translateX(-60%) rotate(12deg);
+    transition: transform 520ms ease;
+    pointer-events: none;
+    mix-blend-mode: screen;
   }
 
   .btn-primary:hover {
@@ -260,6 +348,8 @@
     transform: translateY(-2px);
     box-shadow: 0 8px 30px rgba(0, 212, 255, 0.35);
   }
+
+  .btn-primary:hover::after { transform: translateX(60%) rotate(12deg); }
 
   .btn-secondary {
     display: inline-flex;
@@ -283,6 +373,12 @@
     border-color: var(--accent);
     color: var(--accent);
     transform: translateY(-2px);
+  }
+
+  a:focus-visible,
+  button:focus-visible {
+    outline: 2px solid rgba(0, 212, 255, 0.45);
+    outline-offset: 4px;
   }
 
   /* TERMINAL */
@@ -365,7 +461,7 @@
     max-width: 1300px;
     margin: 0 auto;
     display: grid;
-    grid-template-columns: repeat(6, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
     gap: 0;
   }
 
@@ -457,7 +553,8 @@
     padding: 2.5rem;
     position: relative;
     overflow: hidden;
-    transition: background 0.3s;
+    transition: background 0.3s, transform 0.22s ease, box-shadow 0.22s ease;
+    will-change: transform;
   }
 
   .feature-card::before {
@@ -470,7 +567,11 @@
     transition: transform 0.4s;
   }
 
-  .feature-card:hover { background: #0d1520; }
+  .feature-card:hover {
+    background: #0d1520;
+    transform: translateY(-3px);
+    box-shadow: 0 22px 60px rgba(0,0,0,0.45);
+  }
   .feature-card:hover::before { transform: scaleX(1); }
 
   .feature-icon {
@@ -555,7 +656,8 @@
     gap: 2rem;
     position: relative;
     overflow: hidden;
-    transition: background 0.25s;
+    transition: background 0.25s, transform 0.2s ease, box-shadow 0.2s ease;
+    will-change: transform;
   }
 
   .level-item:last-child { border-bottom: none; }
@@ -571,7 +673,11 @@
     transform-origin: bottom;
   }
 
-  .level-item:hover { background: rgba(0, 212, 255, 0.03); }
+  .level-item:hover {
+    background: rgba(0, 212, 255, 0.03);
+    transform: translateY(-1px);
+    box-shadow: 0 18px 46px rgba(0,0,0,0.35);
+  }
   .level-item:hover::after { transform: scaleY(1); }
 
   .level-num {
@@ -623,11 +729,16 @@
   .profile-card {
     background: var(--bg);
     padding: 1.75rem;
-    transition: background 0.25s;
+    transition: background 0.25s, transform 0.2s ease, box-shadow 0.2s ease;
     position: relative;
+    will-change: transform;
   }
 
-  .profile-card:hover { background: #0b1219; }
+  .profile-card:hover {
+    background: #0b1219;
+    transform: translateY(-2px);
+    box-shadow: 0 18px 46px rgba(0,0,0,0.4);
+  }
 
   .profile-name {
     font-family: var(--mono);
@@ -1014,6 +1125,25 @@
   .reveal.d4 { animation-delay: 0.4s; }
   .reveal.d5 { animation-delay: 0.5s; }
 
+  /* Scroll reveal (JS adds .sr) */
+  .sr {
+    opacity: 0;
+    transform: translateY(18px);
+    filter: blur(6px);
+    transition:
+      opacity 520ms ease,
+      transform 520ms cubic-bezier(0.2, 0.8, 0.2, 1),
+      filter 520ms ease;
+    transition-delay: var(--sr-delay, 0ms);
+    will-change: transform, opacity, filter;
+  }
+
+  .sr.is-inview {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+
   /* DEMO TABS (hero terminal) */
   .demo-tab {
     font-family: var(--mono);
@@ -1067,6 +1197,23 @@
   ::-webkit-scrollbar { width: 4px; }
   ::-webkit-scrollbar-track { background: var(--bg); }
   ::-webkit-scrollbar-thumb { background: var(--border-bright); }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .ambient-bg,
+    .hero-grid-bg,
+    .hero-glow,
+    .hero-glow2,
+    .hero-badge::before {
+      animation: none !important;
+    }
+    .sr {
+      transition: none !important;
+      opacity: 1 !important;
+      transform: none !important;
+      filter: none !important;
+    }
+  }
 
   /* RESPONSIVE */
   @media (max-width: 1024px) {
@@ -1196,10 +1343,20 @@
   }
 
   /* Output */
-  .d-output-scroll { max-height: 360px; overflow-y: auto; overflow-x: hidden; }
-  .d-output-scroll::-webkit-scrollbar { width: 3px; }
+  .d-output-scroll { max-height: 360px; overflow: auto; }
+  .d-output-scroll::-webkit-scrollbar { width: 3px; height: 3px; }
   .d-output-scroll::-webkit-scrollbar-thumb { background: var(--border-bright); }
-  .d-output-code { font-family: var(--mono); font-size: 0.68rem; line-height: 1.8; color: var(--text); word-break: break-all; white-space: pre-wrap; }
+  .d-output-code { font-family: var(--mono); font-size: 0.68rem; line-height: 1.8; color: var(--text); word-break: normal; white-space: pre; }
+  .d-output-code.typing::after {
+    content: '';
+    display: inline-block;
+    width: 7px;
+    height: 13px;
+    background: var(--accent);
+    vertical-align: middle;
+    margin-left: 2px;
+    animation: dCursorBlink 0.9s step-end infinite;
+  }
 
   /* Syntax colors for output */
   .oc-var    { color: #00d4ff; }
@@ -1307,7 +1464,7 @@
   .readme-meta-grid {
     margin-top: 1rem;
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
     gap: 1px;
     background: var(--border);
     border: 1px solid var(--border);
@@ -1352,6 +1509,14 @@
     background: #060a0f;
     padding: 1.4rem;
     clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px));
+    transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+    will-change: transform;
+  }
+
+  .readme-banner-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(0, 212, 255, 0.45);
+    box-shadow: 0 22px 60px rgba(0,0,0,0.45);
   }
 
   .readme-banner-label {
@@ -1439,6 +1604,14 @@
     border: 1px solid var(--border-bright);
     background: #060a0f;
     padding: 1.2rem;
+    transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+    will-change: transform;
+  }
+
+  .readme-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(0, 212, 255, 0.4);
+    box-shadow: 0 18px 50px rgba(0,0,0,0.45);
   }
 
   .readme-card-title {
@@ -1517,13 +1690,16 @@
   .compare-card {
     background: var(--bg);
     padding: 1.5rem;
-    transition: background 0.25s, border-color 0.25s;
+    transition: background 0.25s, border-color 0.25s, transform 0.2s ease, box-shadow 0.2s ease;
     border: 1px solid transparent;
+    will-change: transform;
   }
 
   .compare-card:hover {
     background: #0b1219;
     border-color: var(--border-bright);
+    transform: translateY(-2px);
+    box-shadow: 0 18px 46px rgba(0,0,0,0.4);
   }
 
   .compare-name {
@@ -1562,6 +1738,13 @@
   .method-item {
     background: var(--bg);
     padding: 1rem 1.1rem;
+    transition: background 180ms ease, transform 180ms ease;
+    will-change: transform;
+  }
+
+  .method-item:hover {
+    background: #0b1219;
+    transform: translateY(-1px);
   }
 
   .method-key {
@@ -1633,6 +1816,14 @@
     background: #060a0f;
     border: 1px solid var(--border-bright);
     padding: 1.4rem;
+    transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+    will-change: transform;
+  }
+
+  .metric-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(0, 212, 255, 0.35);
+    box-shadow: 0 18px 50px rgba(0,0,0,0.45);
   }
 
   .metric-title {
@@ -1901,6 +2092,7 @@
 </style>
 </head>
 <body>
+<div class="ambient-bg" aria-hidden="true"></div>
 
 <!-- NAV -->
 <nav>
@@ -1991,16 +2183,31 @@
             </div>
             <div style="font-family:var(--mono);font-size:0.65rem;padding:0.1rem 1rem;color:#c03040;">[<span style="color:#e8f4ff;">&gt;</span>] <span style="color:#c8d8e8;">Telegram : t.me/benzoXdev</span></div>
             <div style="font-family:var(--mono);font-size:0.65rem;padding:0.1rem 1rem 0.5rem;color:#c03040;">[<span style="color:#e8f4ff;">&gt;</span>] <span style="color:#c8d8e8;">Instagram : instagram.com/just._.amar_x1</span></div>
-            <div style="border-top:1px solid #1a2332;padding:0.6rem 1rem;font-family:var(--mono);font-size:0.65rem;">
-              <div><span style="color:#c03040;">[<span style="color:#e8f4ff;">05:12:07</span>]</span> <span style="color:#c03040;">[<span style="color:#e8f4ff;">!</span>]</span> <span style="color:#c8d8e8;"> AUTO mode: engine will analyze and auto-select best settings.</span></div>
-              <div style="margin-top:0.3rem;color:#5a7a9a;"># Input: Write-Output "Hello World"</div>
-              <div><span style="color:#c03040;">[<span style="color:#e8f4ff;">05:12:07</span>]</span> <span style="color:#c03040;">[<span style="color:#e8f4ff;">~</span>]</span> <span style="color:#c8d8e8;"> File 1/1 - Obfuscating: <span style="color:#fff;">hello.ps1</span></span></div>
-              <div style="color:#5aaa88;">  level=5 profile=balanced complexity=3</div>
-              <div style="color:#5aaa88;">  size=1847 bytes | unique=58 | entropy=5.21 | ratio=6.0x | lines=2</div>
-              <div style="color:#5aaa88;">  validation: pass</div>
-              <div><span style="color:#c03040;">[<span style="color:#e8f4ff;">05:12:08</span>]</span> <span style="color:#c03040;">[<span style="color:#e8f4ff;">+</span>]</span> <span style="color:#c8d8e8;"> Done: <span style="color:#fff;">ObfusPS/Script-Obfuscate/hello.ps1</span></span></div>
-              <div style="margin-top:0.4rem;color:#5a7a9a;border-top:1px solid #1a2332;padding-top:0.4rem;font-size:0.58rem;word-break:break-all;line-height:1.5;">[Console]::OutputEncoding = ...; <span style="color:#00d4ff;">$aJAWwC</span> = @(<span style="color:#ffd700;">'/nm/LuepXx','M+K7HEdN6s'</span>,...); <span style="color:#00d4ff;">$tDdZs</span> = 1218952262; <span style="color:#00d4ff;">$dzvgN</span> = New-Object byte[] 32; ... GzipStream ... <span style="color:#7fff00;">&amp; ([scriptblock]::Create($AzMdWB)) @args</span><br><span style="color:#1a2332;"># ObfusPS by BenzoXdev | seed=424242</span></div>
-            </div>
+            <pre style="border-top:1px solid #1a2332;padding:0.6rem 1rem;font-family:var(--mono);font-size:0.62rem;line-height:1.65;color:#c8d8e8;margin:0;white-space:pre;overflow:auto;max-height:420px;">[22:06:57] [>] | Mode (0=Auto/M=Manual/C=Command/R=Recommend, default=0) -&gt;
+[22:06:57] [!] | AUTO mode: engine will analyze script and auto-select best settings.
+[22:06:57] [~] | Removing previous folders..
+[22:06:57] [!] | Previous folders removed.
+[22:06:57] [!] | Creating folder: ObfusPS
+[22:06:57] [!] | File 1/1: helloworld.ps1
+[22:06:57] [!] | Copied: helloworld.ps1 -&gt; ObfusPS\Script\helloworld.ps1
+[22:06:57] [~] | File 1/1 - Obfuscating: helloworld.ps1..
+[22:06:57] [!] | ╔══ Script Analysis ═══════════════════════════════════════╗
+[22:06:57] [!] | ║  Lines: 1       Functions: 0     Classes: 0             ║
+[22:06:57] [!] | ║  Strings: 1      Complexity: 0/100                      ║
+[22:06:57] [!] | ╠══ Recommendation ════════════════════════════════════════╣
+[22:06:57] [!] | ║  → Profile: balanced    Level: 5                        ║
+[22:06:57] [!] | ╚═════════════════════════════════════════════════════════╝
+[22:06:57] [!] | Auto: selected profile balanced
+[22:06:57] [!] | Auto: selected level 5
+[22:06:57] [!] | Seed: 424242 (re-run with -seed 424242 for same output)
+[22:06:57] [!] | Metrics: size=1747 bytes | unique=87 | entropy=5.98 | alnum_ratio=0.66 | ratio=67.2x | lines=2
+[22:06:57] [!] | Wrote: ObfusPS\Script-Obfuscate\helloworld.ps1
+[22:06:57] [!] | Done in 2ms
+[22:06:57] [+] | Done: ObfusPS\Script-Obfuscate\helloworld.ps1
+[22:06:57] [!] | Obfuscation complete: 1 file(s) -&gt; ObfusPS\Script-Obfuscate
+[22:06:57] [!] | Scripts compatible with PowerShell 5.1 &amp; 7.x
+[22:06:57] [!] | Architecture: Go engine; -use-ast for native AST when pwsh available.
+[22:07:00] [>] | Press Enter to continue..</pre>
           </div>
 
           <!-- SLIDE 1 — MANUAL mode -->
@@ -2123,7 +2330,6 @@
           <div class="readme-meta"><span>Version</span><strong>v1.2.0</strong></div>
           <div class="readme-meta"><span>Platform</span><strong>Win/Linux/macOS</strong></div>
           <div class="readme-meta"><span>License</span><strong>Apache-2.0</strong></div>
-          <div class="readme-meta"><span>Visitors</span><strong class="warn" id="visitor-count-main" data-visitor-count>--</strong></div>
         </div>
 
         <div class="readme-warning">For research and authorized testing only.</div>
@@ -2220,10 +2426,6 @@
     <div class="stat-item">
       <span class="stat-num green">9</span>
       <span class="stat-label">Pipeline transforms</span>
-    </div>
-    <div class="stat-item">
-      <span class="stat-num red" id="visitor-count" data-visitor-count>--</span>
-      <span class="stat-label">Visitors</span>
     </div>
     <div class="stat-item">
       <span class="stat-num">0</span>
@@ -3017,9 +3219,9 @@
       <div class="d-transform-label">
         <div class="d-tl-line"></div>
         <div class="d-tl-text">
-          <span style="color:#39ff6a;">●</span>&nbsp;INPUT · 30 bytes · 1 line
+          <span style="color:#39ff6a;">●</span>&nbsp;INPUT · 26 bytes · 1 line
           &nbsp;→&nbsp;
-          <span style="color:#ff3e6c;">●</span>&nbsp;OUTPUT · 1847 bytes · 2 lines · seed=424242
+          <span style="color:#ff3e6c;">●</span>&nbsp;OUTPUT · 1747 bytes · 2 lines · seed=424242
         </div>
         <div class="d-tl-line r"></div>
       </div>
@@ -3030,7 +3232,7 @@
         <div class="d-panel d-panel-l">
           <div class="d-panel-hdr">
             <div class="d-dots"><div class="d-dot d-dot-r"></div><div class="d-dot d-dot-y"></div><div class="d-dot d-dot-g"></div></div>
-            <div class="d-pname">hello.ps1</div>
+            <div class="d-pname">helloworld.ps1</div>
             <div class="d-pbadge d-badge-i">Input</div>
           </div>
           <div class="d-panel-body">
@@ -3038,10 +3240,10 @@
               <div><span class="d-lnum">1</span><span class="d-kw">Write-Output</span> <span class="d-str">"Hello World"</span></div>
             </div>
             <div class="d-meta">
-              <div class="d-mrow"><span>Size</span><span class="d-mval">30 bytes</span></div>
+              <div class="d-mrow"><span>Size</span><span class="d-mval">26 bytes</span></div>
               <div class="d-mrow"><span>Lines</span><span class="d-mval">1</span></div>
               <div class="d-mrow"><span>Encoding</span><span class="d-mval">UTF-8</span></div>
-              <div class="d-mrow"><span>Complexity</span><span class="d-mval" style="color:#39ff6a;">3 / 100</span></div>
+              <div class="d-mrow"><span>Complexity</span><span class="d-mval" style="color:#39ff6a;">0 / 100</span></div>
               <div class="d-mrow"><span>Profile</span><span class="d-mval" style="color:var(--accent);">balanced</span></div>
               <div class="d-mrow"><span>Level</span><span class="d-mval" style="color:var(--accent);">5 — GZip+XOR+Frag</span></div>
               <div class="d-mrow"><span>Fragments</span><span class="d-mval">25 (Fisher-Yates)</span></div>
@@ -3061,7 +3263,7 @@
         <div class="d-panel d-panel-r">
           <div class="d-panel-hdr">
             <div class="d-dots"><div class="d-dot d-dot-r"></div><div class="d-dot d-dot-y"></div><div class="d-dot d-dot-g"></div></div>
-            <div class="d-pname">out.ps1</div>
+            <div class="d-pname">helloworld.ps1</div>
             <div class="d-pbadge d-badge-o">Output</div>
           </div>
           <div class="d-panel-body">
@@ -3075,11 +3277,11 @@
 
       <!-- STATS -->
       <div class="d-stats" id="d-stats" style="opacity:0;transition:opacity 0.5s ease;">
-        <div class="d-stat"><span class="d-sval cyan">1847</span><span class="d-slbl">bytes out</span></div>
-        <div class="d-stat"><span class="d-sval yellow">6.1×</span><span class="d-slbl">size ratio</span></div>
-        <div class="d-stat"><span class="d-sval green">5.21</span><span class="d-slbl">entropy</span></div>
+        <div class="d-stat"><span class="d-sval cyan">1747</span><span class="d-slbl">bytes out</span></div>
+        <div class="d-stat"><span class="d-sval yellow">67.2×</span><span class="d-slbl">size ratio</span></div>
+        <div class="d-stat"><span class="d-sval green">5.98</span><span class="d-slbl">entropy</span></div>
         <div class="d-stat"><span class="d-sval red">25</span><span class="d-slbl">fragments</span></div>
-        <div class="d-stat"><span class="d-sval cyan">58</span><span class="d-slbl">unique chars</span></div>
+        <div class="d-stat"><span class="d-sval cyan">87</span><span class="d-slbl">unique chars</span></div>
       </div>
 
       <!-- VALIDATION -->
@@ -3349,29 +3551,176 @@
 
   renderBenchmarkData();
 
-  // ── SCROLL REVEAL ──
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(e => {
-      if (e.isIntersecting) { e.target.style.opacity = '1'; e.target.style.transform = 'translateY(0)'; }
+  // ── MOTION / REVEAL ──
+  (function initScrollReveal() {
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    const revealSelector = [
+      '.section-tag',
+      '.section-title',
+      '.section-desc',
+      '.stat-item',
+      '.readme-banner-card',
+      '.readme-kpi',
+      '.readme-card',
+      '.feature-card',
+      '.level-item',
+      '.profile-card',
+      '.code-panel',
+      '.code-block',
+      '.flag-row',
+      '.tech-card',
+      '.install-step',
+      '.compare-card',
+      '.method-item',
+      '.metric-card',
+      '.comparison-table-wrap',
+      '.strategy-card'
+    ].join(', ');
+
+    const elements = Array.from(document.querySelectorAll(revealSelector))
+      .filter(el => !el.classList.contains('reveal'));
+
+    if (!elements.length) return;
+
+    const addStagger = (selector, stepMs, cap = 10) => {
+      document.querySelectorAll(selector).forEach((el, i) => {
+        const d = Math.min(i, cap) * stepMs;
+        el.style.setProperty('--sr-delay', d + 'ms');
+      });
+    };
+
+    elements.forEach(el => el.classList.add('sr'));
+
+    addStagger('.feature-card', 70, 8);
+    addStagger('.level-item', 45, 8);
+    addStagger('.profile-card', 45, 10);
+    addStagger('.flag-row', 14, 14);
+    addStagger('.compare-card', 55, 10);
+    addStagger('.method-item', 20, 12);
+    addStagger('.readme-kpi', 35, 10);
+    addStagger('.stat-item', 40, 10);
+
+    const obs = new IntersectionObserver((entries, o) => {
+      entries.forEach(e => {
+        if (!e.isIntersecting) return;
+        e.target.classList.add('is-inview');
+        o.unobserve(e.target);
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -10% 0px' });
+
+    elements.forEach(el => obs.observe(el));
+  })();
+
+  // ── NAV UX ──
+  (function initNavUx() {
+    const nav = document.querySelector('nav');
+    if (!nav) return;
+
+    const setScrolled = () => nav.classList.toggle('nav-scrolled', window.scrollY > 20);
+    setScrolled();
+    window.addEventListener('scroll', setScrolled, { passive: true });
+
+    const links = Array.from(nav.querySelectorAll('.nav-links a'))
+      .filter(a => (a.getAttribute('href') || '').startsWith('#') && (a.getAttribute('href') || '').length > 1);
+
+    const targets = [];
+    const linkByTarget = new Map();
+    links.forEach(link => {
+      const id = link.getAttribute('href').slice(1);
+      const target = document.getElementById(id);
+      if (!target) return;
+      targets.push(target);
+      linkByTarget.set(target, link);
     });
-  }, { threshold: 0.08 });
 
-  document.querySelectorAll('.feature-card, .level-item, .profile-card, .tech-card, .install-step, .flag-row, .compare-card, .method-item, .metric-card, .strategy-card').forEach(el => {
-    el.style.opacity = '0';
-    el.style.transform = 'translateY(18px)';
-    el.style.transition = 'opacity 0.45s ease, transform 0.45s ease';
-    observer.observe(el);
-  });
-  document.querySelectorAll('.feature-card').forEach((el, i) => { el.style.transitionDelay = (i * 0.06) + 's'; });
-  document.querySelectorAll('.profile-card').forEach((el, i) => { el.style.transitionDelay = (i * 0.04) + 's'; });
-  document.querySelectorAll('.flag-row').forEach((el, i) => { el.style.transitionDelay = (i * 0.015) + 's'; });
-  document.querySelectorAll('.compare-card').forEach((el, i) => { el.style.transitionDelay = (i * 0.05) + 's'; });
+    if (!targets.length) return;
 
-  // ── NAV SCROLL ──
-  const nav = document.querySelector('nav');
-  window.addEventListener('scroll', () => {
-    nav.style.borderBottomColor = window.scrollY > 50 ? 'var(--border-bright)' : 'var(--border)';
-  });
+    let active = null;
+    const setActive = (link) => {
+      if (active === link) return;
+      if (active) active.classList.remove('is-active');
+      active = link;
+      if (active) active.classList.add('is-active');
+    };
+
+    const ratios = new Map();
+    const spy = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        ratios.set(e.target, e.isIntersecting ? e.intersectionRatio : 0);
+      });
+
+      let bestTarget = null;
+      let bestRatio = 0;
+      ratios.forEach((ratio, target) => {
+        if (ratio > bestRatio) { bestRatio = ratio; bestTarget = target; }
+      });
+
+      if (bestTarget) setActive(linkByTarget.get(bestTarget));
+    }, { rootMargin: '-35% 0px -55% 0px', threshold: [0.12, 0.25, 0.4, 0.55] });
+
+    targets.forEach(t => spy.observe(t));
+  })();
+
+  // ── COUNT UP ──
+  (function initCountUp() {
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    const parseNumber = (text) => {
+      const raw = String(text || '').trim();
+      if (!raw) return null;
+      const m = raw.match(/^([0-9]+(?:\\.[0-9]+)?)(.*)$/);
+      if (!m) return null;
+      const value = Number(m[1]);
+      if (!Number.isFinite(value)) return null;
+      return { value, suffix: m[2] || '' };
+    };
+
+    const candidates = Array.from(document.querySelectorAll('.stats-bar .stat-num, .readme-kpi-num'));
+    const metaByEl = new Map();
+    candidates.forEach(el => {
+      const parsed = parseNumber(el.textContent);
+      if (!parsed) return;
+      const decimals = String(parsed.value).includes('.') ? String(parsed.value).split('.')[1].length : 0;
+      metaByEl.set(el, { ...parsed, decimals });
+    });
+
+    if (!metaByEl.size) return;
+
+    const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
+
+    const animate = (el, toValue, suffix, decimals, durationMs) => {
+      const start = performance.now();
+
+      const tick = (now) => {
+        const t = Math.min(1, (now - start) / durationMs);
+        const v = toValue * easeOutCubic(t);
+        const formatted = decimals ? v.toFixed(decimals) : String(Math.round(v));
+        el.textContent = formatted + suffix;
+        if (t < 1) requestAnimationFrame(tick);
+      };
+
+      requestAnimationFrame(tick);
+    };
+
+    const obs = new IntersectionObserver((entries, o) => {
+      entries.forEach(e => {
+        if (!e.isIntersecting) return;
+        const el = e.target;
+        if (el.dataset.counted === '1') return;
+
+        const info = metaByEl.get(el);
+        if (!info) return;
+
+        el.dataset.counted = '1';
+        el.textContent = (info.decimals ? (0).toFixed(info.decimals) : '0') + info.suffix;
+        animate(el, info.value, info.suffix, info.decimals, 900);
+        o.unobserve(el);
+      });
+    }, { threshold: 0.65 });
+
+    metaByEl.forEach((_, el) => obs.observe(el));
+  })();
 
   // Comparison bars animation
   function initComparisonBars() {
@@ -3395,49 +3744,7 @@
     chartObs.observe(section);
   }
 
-  // Visitor counter with shared API and local fallback
-  async function initVisitorCounter() {
-    const counterEls = Array.from(document.querySelectorAll('[data-visitor-count]'));
-    if (!counterEls.length) return;
-
-    const formatCount = (value) => {
-      const n = Number(value);
-      return Number.isFinite(n) ? n.toLocaleString('en-US') : '--';
-    };
-
-    const setCount = (value) => {
-      const text = formatCount(value);
-      counterEls.forEach(el => { el.textContent = text; });
-    };
-
-    const fallbackLocalCounter = () => {
-      try {
-        const totalKey = 'obfusps_local_visits_total';
-        const sessionKey = 'obfusps_local_visits_seen';
-        let total = parseInt(localStorage.getItem(totalKey) || '0', 10);
-        if (!sessionStorage.getItem(sessionKey)) {
-          total += 1;
-          localStorage.setItem(totalKey, String(total));
-          sessionStorage.setItem(sessionKey, '1');
-        }
-        setCount(total);
-      } catch (_) {
-        setCount('--');
-      }
-    };
-
-    try {
-      const res = await fetch('https://api.countapi.xyz/hit/obfusps_site/visitors', { cache: 'no-store' });
-      if (!res.ok) throw new Error('Counter API unavailable');
-      const data = await res.json();
-      setCount(data.value);
-    } catch (_) {
-      fallbackLocalCounter();
-    }
-  }
-
   initComparisonBars();
-  initVisitorCounter();
 
   // ══════════════════════════════════════
   //  LIVE DEMO ENGINE
@@ -3466,7 +3773,9 @@
   function dStartDemo() {
     if (dTimer) clearInterval(dTimer);
     dIdx = 0;
-    document.getElementById('d-output-code').innerHTML = '';
+    const outEl = document.getElementById('d-output-code');
+    outEl.textContent = '';
+    outEl.classList.add('typing');
     document.getElementById('d-stats').style.opacity = '0';
     document.getElementById('d-vbar').style.opacity = '0';
     document.getElementById('d-pfill').style.width = '0%';
@@ -3476,12 +3785,13 @@
     const total = D_OUTPUT.length;
     dTimer = setInterval(() => {
       dIdx = Math.min(dIdx + 7, total);
-      document.getElementById('d-output-code').innerHTML =
-        dColorize(D_OUTPUT.slice(0, dIdx)) +
-        (dIdx < total ? '<span class="d-tw-cursor"></span>' : '');
+      outEl.textContent = D_OUTPUT.slice(0, dIdx);
+      outEl.classList.toggle('typing', dIdx < total);
       document.getElementById('d-pfill').style.width = (dIdx / total * 100) + '%';
       const sc = document.querySelector('.d-output-scroll');
-      if (sc) sc.scrollTop = sc.scrollHeight;
+      if (sc) {
+        sc.scrollTop = sc.scrollHeight;
+      }
       if (dIdx >= total) {
         clearInterval(dTimer);
         setTimeout(() => { document.getElementById('d-stats').style.opacity = '1'; }, 300);
